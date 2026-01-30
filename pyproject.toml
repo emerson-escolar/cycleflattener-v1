@@ -1,0 +1,25 @@
+[project]
+name = "cycleflattener"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = []
+
+
+[tool.uv]
+package = true
+
+[tool.uv.workspace]
+members = [
+    ".",
+    ".",
+]
+
+[tool.uv.sources]
+cycleflattener = { workspace = true }
+
+[dependency-groups]
+dev = [
+    "cycleflattener",
+]
