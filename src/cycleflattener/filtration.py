@@ -3,10 +3,15 @@ import ast
 import scipy.spatial.distance as ssd
 import scipy.sparse as ssm
 
+import itertools
 
 def list_to_lookupdict(x:list):
     return {v:k for k,v in enumerate(x)}
 
+def compute_angle(a, b):
+    cos = a @ b / (np.linalg.norm(a) * np.linalg.norm(b))
+    rad = np.arccos(cos)
+    return rad
 
 class Filtration:
     vertex_coordinates: np.array
@@ -29,6 +34,20 @@ class Filtration:
     @property
     def num_vertices(self):
         return self.vertex_coordinates.shape[0]
+
+    @property
+    def vertexindex_to_simplexindex(self):
+        # vertexindex is index in self.vertices
+        # vertex_simplexindex is index in self.simplices (looking only at dim 0 simplices)
+        return { self.get_simplex_vlist(simplexindex)[0] : simplexindex
+                 for simplexindex in self.get_simplexindices_satisfying(dim=0)}
+
+    @property
+    def vertex_simplexindex_to_vertexindex(self):
+        # vertexindex is index in self.vertices
+        # vertex_simplexindex is index in self.simplices (looking only at dim 0 simplices)
+        return { simplexindex : self.get_simplex_vlist(simplexindex)[0]
+                 for simplexindex in self.get_simplexindices_satisfying(dim=0)}
 
     @property
     def num_simplices(self):
@@ -122,17 +141,15 @@ class Filtration:
 
 
     def get_boundary_coeff(self, query_simplexindex, face_simplexindex):
-        if face_simplexindex in self.boundaries[query_simplexindex]:
-            return self.boundaries[query_simplexindex][face_simplexindex]
-        else:
-            return 0
+        return self.boundaries[query_simplexindex].get(query_simplexindex, 0)
 
     def get_boundary_matrix(self, dim:int):
         cur_simplices = self.get_simplexindices_satisfying(dim=dim)
         dwn_simplices = self.get_simplexindices_satisfying(dim=dim-1)
 
-        cur_rev = list_to_lookupdict(cur_simplices)
-        dwn_rev = list_to_lookupdict(dwn_simplices)
+        # subindex is index in simplices restricted to dimension dim and dim-1
+        cur_subindex_dict = list_to_lookupdict(cur_simplices)
+        dwn_subindex_dict = list_to_lookupdict(dwn_simplices)
 
         csr_data = []
         csr_row_indices = []
@@ -141,16 +158,52 @@ class Filtration:
         for simplexindex in cur_simplices:
             for face_simplexindex in self.boundaries[simplexindex]:
                 csr_data.append(self.boundaries[simplexindex][face_simplexindex])
-                csr_col_indices.append( cur_rev[simplexindex] )
-                csr_row_indices.append( dwn_rev[face_simplexindex] )
+                csr_col_indices.append( cur_subindex_dict[simplexindex] )
+                csr_row_indices.append( dwn_subindex_dict[face_simplexindex] )
 
         return ssm.csr_matrix((csr_data, (csr_row_indices,csr_col_indices)),
                               shape=(len(dwn_simplices),len(cur_simplices)))
 
 
 
-
     def get_exterior_angles_matrix(self):
         edges = self.get_simplexindices_satisfying(dim=1)
+        vertices = self.get_simplexindices_satisfying(dim=0)
 
-        # TODO
+        edges_subindex_dict = list_to_lookupdict(edges)
+        vertices_subindex_dict = list_to_lookupdict(vertices)
+
+        bdd = self.get_boundary_matrix(1)
+        for vertex_simplexindex in vertices:
+            vertex_subindex = vertices_subindex_dict[vertex_simplexindex]
+            coface_subindices = bdd[vertex_subindex].nonzero()[1]
+
+            csr_data = []
+            csr_row_indices = []
+            csr_col_indices = []
+
+            v_vindex = self.vertex_simplexindex_to_vertexindex[vertex_simplexindex]
+            def __get_other(vlist, toexclude):
+                other = [v for v in vlist if v!=toexclude]
+                assert(len(other) == 1)
+                return other[0]
+            for e1_sub, e2_sub in itertools.combinations(coface_subindices, 2):
+                e1 = edges[e1_sub]
+                e2 = edges[e2_sub]
+                x_vindex = __get_other(self.get_simplex_vlist(e1), v_vindex)
+                y_vindex = __get_other(self.get_simplex_vlist(e2), v_vindex)
+
+                a = self.vertex_coordinates[x_vindex, :] - self.vertex_coordinates[v_vindex, :]
+                b = self.vertex_coordinates[v_vindex, :] - self.vertex_coordinates[y_vindex, :]
+                angle = compute_angle(a,b)
+
+                csr_data.append(angle)
+                csr_row_indices.append(e1_sub)
+                csr_col_indices.append(e2_sub)
+
+                csr_data.append(angle)
+                csr_row_indices.append(e2_sub)
+                csr_col_indices.append(e1_sub)
+
+        return ssm.csr_matrix((csr_data, (csr_row_indices,csr_col_indices)),
+                              shape=(len(edges),len(edges)))

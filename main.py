@@ -36,6 +36,10 @@ def main():
     print(foo.get_boundary_matrix(2).toarray())
     print(foo.get_simplexindices_satisfying(dim=1))
 
+    print("\n")
+
+    print(foo.get_exterior_angles_matrix().toarray())
+
 
 
 if __name__ == "__main__":
