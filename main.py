@@ -40,6 +40,9 @@ def main():
 
     print(foo.get_exterior_angles_matrix().toarray())
 
+    foo._load_1_cycles("./testdata/gen_sample_1.txt")
+    print(foo.cycles)
+
 
 
 if __name__ == "__main__":

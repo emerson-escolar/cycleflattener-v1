@@ -27,7 +27,6 @@ class Filtration:
         self.vertex_coordinates = np.array([])
         self.simplices = []
         self.boundary_dict = {}
-
         self.cycles = []
 
 
@@ -82,6 +81,44 @@ class Filtration:
             self.simplices = list(__alphamap_processor(ifile))
 
 
+    def _load_1_cycles(self, fname:str):
+        # expects: optiperslp generators format
+        # only works for dimension 1 cycles.
+
+        cycles = []
+        edge_simplexindex_dict = self.__vindex_fset_to_edge_simplexindex()
+        with open(fname) as ifile:
+            cycle = {}
+            for line in ifile:
+                line = line.strip()
+                print(line)
+                if line[0] == ';':
+                    if len(cycle) != 0:
+                        cycles.append( (cycle, bdpair) )
+                        cycle = {}
+                    lifespan_part = line.split()
+                    print(lifespan_part)
+                    birth = float(lifespan_part[1])
+                    death = float(lifespan_part[2])
+                    bdpair = (birth, death)
+                else:
+                    cycle_part = line.split(",")
+                    assert(len(cycle_part) == 3)
+
+                    coeff = float(cycle_part[0])
+                    v_fset = frozenset([int(cycle_part[1]), int(cycle_part[2])])
+                    cycle[edge_simplexindex_dict[v_fset]] = coeff
+
+            cycle_bd = (cycle, bdpair)
+            cycles.append( cycle_bd )
+        self.cycles = cycles
+
+
+    def __vindex_fset_to_edge_simplexindex(self):
+        edges = self.get_simplexindices_satisfying(dim=1)
+        return { frozenset(self.get_simplex_vlist(simplexindex)) : simplexindex
+                 for simplexindex in edges }
+
     def _load_boundaries(self, fname:str):
         # expects "boundary" file
         # format: simplexindex : {(simplexindex, coeff), ... }
@@ -99,11 +136,6 @@ class Filtration:
             self.boundaries = list(__boundary_processor(ifile))
 
 
-    def get_simplexindices_satisfying(self, dim:int, maxbirth=np.inf) -> list:
-        return [i for i, simplex in enumerate(self.simplices) if
-                (simplex[type(self).KEY_birth] <= maxbirth) and
-                (simplex[type(self).KEY_dim] == dim)]
-
     def get_simplex_birth(self, simplexindex:int) -> float:
         return self.simplices[simplexindex][type(self).KEY_birth]
     def get_simplex_dim(self, simplexindex:int) -> int:
@@ -111,18 +143,8 @@ class Filtration:
     def get_simplex_vlist(self, simplexindex:int) -> list[int]:
         return self.simplices[simplexindex][type(self).KEY_vlist]
 
-    def get_exterior_angle(self, simplexindex1:int, simplexindex2:int) -> float:
-        if self.get_simplex_dim(simplexindex1) != 1 or self.get_simplex_dim(simplexindex2) != 1:
-            print(f"ERROR: get_exterior_angle called on non-edge(s): {simplexindex1} and {simplexindex2}")
-            return -1.0
 
-        # TODO
-        return 0.0
-
-
-
-    def get_neighborhood_simplexindices(self, vertexindices:list, eps:float=0.0,
-                                        candidate_simplexindices:list|None=None) -> list:
+    def get_neighborhood_simplexindices(self, vertexindices:list, eps:float=0.0) -> list:
         # From the list of candidate_simplexindices,
         # extract the sublist of simplexindices whose simplex has each vertex
         # at most distance eps from the set of vertexindices.
@@ -131,21 +153,28 @@ class Filtration:
         neighborhood_vertexindices = {vertexindex for vertexindex in range(self.num_vertices) if
                                       np.min(dist_vs[:, vertexindex]) <= eps}
 
-        if candidate_simplexindices is None: candidate_simplexindices = range(self.num_simplices)
-        def __generator(neighborhood_vertexindices, candidate_simplexindices):
-            for simplexindex in candidate_simplexindices:
+        def __generator(neighborhood_vertexindices):
+            for simplexindex in range(self.num_simplices):
                 if set(self.get_simplex_vlist(simplexindex)).issubset(neighborhood_vertexindices):
                     yield simplexindex
 
-        return list(__generator(neighborhood_vertexindices, candidate_simplexindices))
+        return list(__generator(neighborhood_vertexindices))
+
+
+    def get_simplexindices_satisfying(self, dim:int, maxbirth=np.inf, nbhd:list=None) -> list:
+        if nbhd is None:
+            nbhd = range(self.num_simplices)
+        return [i for i in nbhd if
+                (self.simplices[i][type(self).KEY_birth] <= maxbirth) and
+                (self.simplices[i][type(self).KEY_dim] == dim)]
 
 
     def get_boundary_coeff(self, query_simplexindex, face_simplexindex):
         return self.boundaries[query_simplexindex].get(query_simplexindex, 0)
 
-    def get_boundary_matrix(self, dim:int):
-        cur_simplices = self.get_simplexindices_satisfying(dim=dim)
-        dwn_simplices = self.get_simplexindices_satisfying(dim=dim-1)
+    def get_boundary_matrix(self, dim:int, maxbirth=np.inf, nbhd:list=None):
+        cur_simplices = self.get_simplexindices_satisfying(dim=dim, maxbirth=maxbirth, nbhd=nbhd)
+        dwn_simplices = self.get_simplexindices_satisfying(dim=dim-1, maxbirth=maxbirth, nbhd=nbhd)
 
         # subindex is index in simplices restricted to dimension dim and dim-1
         cur_subindex_dict = list_to_lookupdict(cur_simplices)
@@ -165,12 +194,9 @@ class Filtration:
                               shape=(len(dwn_simplices),len(cur_simplices)))
 
 
-
-    def get_exterior_angles_matrix(self):
-        edges = self.get_simplexindices_satisfying(dim=1)
-        vertices = self.get_simplexindices_satisfying(dim=0)
-
-        edges_subindex_dict = list_to_lookupdict(edges)
+    def get_exterior_angles_matrix(self, maxbirth=np.inf, nbhd:list=None):
+        edges = self.get_simplexindices_satisfying(dim=1, maxbirth=maxbirth, nbhd=nbhd)
+        vertices = self.get_simplexindices_satisfying(dim=0, maxbirth=maxbirth, nbhd=nbhd)
         vertices_subindex_dict = list_to_lookupdict(vertices)
 
         bdd = self.get_boundary_matrix(1)
@@ -207,3 +233,31 @@ class Filtration:
 
         return ssm.csr_matrix((csr_data, (csr_row_indices,csr_col_indices)),
                               shape=(len(edges),len(edges)))
+
+
+    def compute_angleoptimal_homologous_cycle(self, cycle_bd, eps):
+        cycle = cycle_bd[0]
+        cycle_birth = cycle_bd[1][0]
+        cycle_death = cycle_bd[1][1]
+
+        # get incident vertices:
+        vertex_vindices = []
+        for edge_simplexindex in cycle.keys():
+            for vindex in self.get_simplex_vlist(edge_simplexindex):
+                vertex_vindices.append(vindex)
+        vertex_vindices = list(set(vertex_vindices))
+
+        # get relevant nbhd:
+        nbhd = self.get_neighborhood_simplexindices(vertex_vindices, eps)
+
+        Q = self.get_exterior_angles_matrix(nbhd=nbhd)
+        D2 = self.get_boundary_matrix(dim=2, nbhd=nbhd)
+        Q_hat = spm.sparse.vstack((spm.sparse.hstack((Q, Q)),
+                                   spm.sparse.hstack((Q, Q))))
+        E = spm.sparse.identity(D2_matrix.shape[0], dtype=float, format="csr")
+        A = spm.sparse.hstack((E, -E, -D2, D2))
+
+
+
+
+        pass
