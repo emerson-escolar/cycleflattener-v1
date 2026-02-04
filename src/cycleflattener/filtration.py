@@ -5,6 +5,8 @@ import scipy.sparse as ssm
 
 import itertools
 
+import cycleflattener.angleoptimizer as ao
+
 def list_to_lookupdict(x:list):
     return {v:k for k,v in enumerate(x)}
 
@@ -245,6 +247,13 @@ class Filtration:
                               shape=(len(edges),len(edges)))
 
 
+    def print_1_cycle(self, cycle):
+        #  cycle is a dictionary {simplexindex:coeff} representing a cycle.
+
+        # TODO: print cycle nicely. (handle non-simple cases too?)
+        pass
+
+
     def context_vectorize_1_cycle(self, cycle, maxbirth=np.inf, nbhd:list=None):
         # Member functions with "context" depend on the context of
         #  maxbirth and nbhd
@@ -269,7 +278,22 @@ class Filtration:
                               shape=(len(edges),1))
 
 
+    def context_vector_to_1_cycle(self, vec:ssm.csr_matrix,
+                                  maxbirth=np.inf, nbhd:list=None):
+        # Member functions with "context" depend on the context of
+        #  maxbirth and nbhd
+        # i.e.\ taken in the context of a subsmplicial complex defined by these parameters.
+        # For consistency, ensure that the same context is used!
 
+        # vec is a ssm.csr_matrix representing vector, with respect to subindices
+        # cycle is a dictionary {simplexindex:coeff} representing a cycle.
+
+        edges = self.get_simplexindices_satisfying(dim=1, maxbirth=maxbirth, nbhd=nbhd)
+
+        vec_coo = vec.tocoo()
+        cycle = {edges[r]: v for r, v in zip(vec_coo.row, vec_coo.data)}
+
+        return cycle
 
 
     def compute_angleoptimal_homologous_cycle(self, cycle_bd, eps):
@@ -296,12 +320,22 @@ class Filtration:
         D2 = self.context_boundary_matrix(dim=2, nbhd=nbhd)
         z = self.context_vectorize_1_cycle(cycle, nbhd=nbhd)
 
-        Q_hat = spm.sparse.vstack((spm.sparse.hstack((Q, Q)),
-                                   spm.sparse.hstack((Q, Q))))
-        E = spm.sparse.identity(D2_matrix.shape[0], dtype=float, format="csr")
-        A = spm.sparse.hstack((E, -E, -D2, D2))
+        Qhat = ssm.vstack((ssm.hstack((Q, Q)),
+                            ssm.hstack((Q, Q))))
+        E = ssm.identity(D2.shape[0], dtype=float, format="csr")
+        A = ssm.hstack((E, -E, -D2, D2))
+
+        angleoptimizer = ao.AngleOptimizer(Qhat, A, z, "Angle Optimization via BQP")
+        angleoptimizer.mdl.parameters.print_information(print_all=True)
 
 
+        print("\n\n******************************\n")
+        solution, x_vec, y_vec = angleoptimizer.solve()
+
+        print(x_vec)
+        print(y_vec)
+
+        print(self.context_vector_to_1_cycle(x_vec, nbhd=nbhd))
 
 
         pass

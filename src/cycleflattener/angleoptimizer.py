@@ -4,6 +4,7 @@ import docplex.mp.model
 
 class AngleOptimizer:
     mdl: docplex.mp.model.Model
+    z: ssm.csr_matrix
 
     def __init__(self, Qhat:ssm.csr_matrix, A:ssm.csr_matrix, z:ssm.csr_matrix, model_name):
         self.A = A
@@ -30,15 +31,54 @@ class AngleOptimizer:
         variables = self.x_variables + self.y_variables
         for i in range(A.shape[0]):
             lhs = 0
-            for c, v in zip(A[i,:].col, A[i,:].data):
+            row = A[i,:].tocoo()
+            for c, v in zip(row.col, row.data):
                 lhs +=  v * variables[c]
-            self.mdl.add_constraint( lhs == self.z[i] )
-
+            self.mdl.add_constraint( lhs == self.z[i,0] )
 
     @property
     def num_x_variables(self):
-        return 2 * len(self.z)
+        return 2 * self.z.shape[0]
 
     @property
     def num_y_variables(self):
         return self.A.shape[1] - 2 * self.A.shape[0]
+
+
+    def __solution_to_csr(self, solution:docplex.mp.solution.SolveSolution,
+                          variables_choice:str):
+        if variables_choice == "x":
+            variables = self.x_variables
+        elif variables_choice == "y":
+            variables = self.y_variables
+        else:
+            variables = []
+
+        assert(len(variables) % 2 == 0)
+        mid = len(variables) // 2
+
+        plus_minus = [0, 0]
+        for j in range(2):
+            csr_data = []
+            csr_row_indices = []
+            variables_half = variables[mid*j:mid*(j+1)]
+            for i, value in enumerate(solution.get_value_list(variables_half)):
+                if value != 0:
+                    csr_data.append(value)
+                    csr_row_indices.append(i)
+            plus_minus[j] = ssm.csr_matrix((csr_data,
+                                            (csr_row_indices, [0]*len(csr_data))),
+                                            (i+1, 1))
+
+        return plus_minus[0] - plus_minus[1]
+
+    def solve(self, **kwargs):
+        solution = self.mdl.solve(**kwargs)
+        if solution is None:
+            x_vec = None
+            y_vec = None
+        else:
+            x_vec = self.__solution_to_csr(solution, "x")
+            y_vec = self.__solution_to_csr(solution, "y")
+
+        return (solution, x_vec, y_vec)
