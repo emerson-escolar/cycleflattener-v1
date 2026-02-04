@@ -172,13 +172,18 @@ class Filtration:
     def get_boundary_coeff(self, query_simplexindex, face_simplexindex):
         return self.boundaries[query_simplexindex].get(query_simplexindex, 0)
 
-    def get_boundary_matrix(self, dim:int, maxbirth=np.inf, nbhd:list=None):
+    def context_boundary_matrix(self, dim:int, maxbirth=np.inf, nbhd:list=None):
+        # Member functions with "context" depend on the context of
+        #  maxbirth and nbhd
+        # i.e.\ taken in the context of a subsmplicial complex defined by these parameters.
+        # For consistency, ensure that the same context is used!
+
         cur_simplices = self.get_simplexindices_satisfying(dim=dim, maxbirth=maxbirth, nbhd=nbhd)
         dwn_simplices = self.get_simplexindices_satisfying(dim=dim-1, maxbirth=maxbirth, nbhd=nbhd)
 
         # subindex is index in simplices restricted to dimension dim and dim-1
-        cur_subindex_dict = list_to_lookupdict(cur_simplices)
-        dwn_subindex_dict = list_to_lookupdict(dwn_simplices)
+        cur_tosubindex_dict = list_to_lookupdict(cur_simplices)
+        dwn_tosubindex_dict = list_to_lookupdict(dwn_simplices)
 
         csr_data = []
         csr_row_indices = []
@@ -187,21 +192,26 @@ class Filtration:
         for simplexindex in cur_simplices:
             for face_simplexindex in self.boundaries[simplexindex]:
                 csr_data.append(self.boundaries[simplexindex][face_simplexindex])
-                csr_col_indices.append( cur_subindex_dict[simplexindex] )
-                csr_row_indices.append( dwn_subindex_dict[face_simplexindex] )
+                csr_col_indices.append( cur_tosubindex_dict[simplexindex] )
+                csr_row_indices.append( dwn_tosubindex_dict[face_simplexindex] )
 
         return ssm.csr_matrix((csr_data, (csr_row_indices,csr_col_indices)),
                               shape=(len(dwn_simplices),len(cur_simplices)))
 
 
-    def get_exterior_angles_matrix(self, maxbirth=np.inf, nbhd:list=None):
+    def context_exterior_angles_matrix(self, maxbirth=np.inf, nbhd:list=None):
+        # Member functions with "context" depend on the context of
+        #  maxbirth and nbhd
+        # i.e.\ taken in the context of a subsmplicial complex defined by these parameters.
+        # For consistency, ensure that the same context is used!
+
         edges = self.get_simplexindices_satisfying(dim=1, maxbirth=maxbirth, nbhd=nbhd)
         vertices = self.get_simplexindices_satisfying(dim=0, maxbirth=maxbirth, nbhd=nbhd)
-        vertices_subindex_dict = list_to_lookupdict(vertices)
+        vertices_tosubindex_dict = list_to_lookupdict(vertices)
 
-        bdd = self.get_boundary_matrix(1)
+        bdd = self.context_boundary_matrix(1, maxbirth=maxbirth, nbhd=nbhd)
         for vertex_simplexindex in vertices:
-            vertex_subindex = vertices_subindex_dict[vertex_simplexindex]
+            vertex_subindex = vertices_tosubindex_dict[vertex_simplexindex]
             coface_subindices = bdd[vertex_subindex].nonzero()[1]
 
             csr_data = []
@@ -235,7 +245,39 @@ class Filtration:
                               shape=(len(edges),len(edges)))
 
 
+    def context_vectorize_1_cycle(self, cycle, maxbirth=np.inf, nbhd:list=None):
+        # Member functions with "context" depend on the context of
+        #  maxbirth and nbhd
+        # i.e.\ taken in the context of a subsmplicial complex defined by these parameters.
+        # For consistency, ensure that the same context is used!
+
+        #  cycle is a dictionary {simplexindex:coeff} representing a cycle.
+
+        edges = self.get_simplexindices_satisfying(dim=1, maxbirth=maxbirth, nbhd=nbhd)
+        edges_tosubindex_dict = list_to_lookupdict(edges)
+
+        csr_data = []
+        csr_row_indices = []
+        csr_col_indices = []
+
+        for simplexindex, coeff in cycle.items():
+            csr_data.append(coeff)
+            csr_row_indices.append(edges_tosubindex_dict[simplexindex])
+            csr_col_indices.append(0)
+
+        return ssm.csr_matrix((csr_data, (csr_row_indices,csr_col_indices)),
+                              shape=(len(edges),1))
+
+
+
+
+
     def compute_angleoptimal_homologous_cycle(self, cycle_bd, eps):
+        # assumptions:
+        # cycle_bd is a pair of a cycle and a bd_pair
+        #  cycle is a dictionary {simplexindex:coeff} representing a cycle.
+        #  bd_pair is a pair (birth, death)
+
         cycle = cycle_bd[0]
         cycle_birth = cycle_bd[1][0]
         cycle_death = cycle_bd[1][1]
@@ -250,8 +292,10 @@ class Filtration:
         # get relevant nbhd:
         nbhd = self.get_neighborhood_simplexindices(vertex_vindices, eps)
 
-        Q = self.get_exterior_angles_matrix(nbhd=nbhd)
-        D2 = self.get_boundary_matrix(dim=2, nbhd=nbhd)
+        Q = self.context_exterior_angles_matrix(nbhd=nbhd)
+        D2 = self.context_boundary_matrix(dim=2, nbhd=nbhd)
+        z = self.context_vectorize_1_cycle(cycle, nbhd=nbhd)
+
         Q_hat = spm.sparse.vstack((spm.sparse.hstack((Q, Q)),
                                    spm.sparse.hstack((Q, Q))))
         E = spm.sparse.identity(D2_matrix.shape[0], dtype=float, format="csr")
