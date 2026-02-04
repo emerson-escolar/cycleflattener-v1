@@ -11,7 +11,7 @@ def list_to_lookupdict(x:list):
     return {v:k for k,v in enumerate(x)}
 
 def compute_angle(a, b):
-    cos = a @ b / (np.linalg.norm(a) * np.linalg.norm(b))
+    cos = np.inner(a,b) / (np.linalg.norm(a) * np.linalg.norm(b))
     rad = np.arccos(cos)
     return rad
 
@@ -336,10 +336,16 @@ class Filtration:
         angleoptimizer = ao.AngleOptimizer(Qhat, A, z, "Angle Optimization via BQP")
         angleoptimizer.mdl.parameters.print_information(print_all=True)
 
-
         print("\n\n******************************\n")
+
+        print("num x vars: ", angleoptimizer.num_x_variables)
+        print("num y vars: ", angleoptimizer.num_y_variables)
+
+        angleoptimizer.mdl.export_as_lp(basename="quadratic_optimize",
+                                        path="qp")
         solution, x_vec, y_vec = angleoptimizer.solve()
 
+        print("solution value:", solution.objective_value)
         print(x_vec)
         print(y_vec)
 
