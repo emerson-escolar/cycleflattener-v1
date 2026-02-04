@@ -1,9 +1,9 @@
-import numpy as np
 import ast
+import itertools
+import numpy as np
 import scipy.spatial.distance as ssd
 import scipy.sparse as ssm
-
-import itertools
+import networkx as nx
 
 import cycleflattener.angleoptimizer as ao
 
@@ -249,9 +249,17 @@ class Filtration:
 
     def print_1_cycle(self, cycle):
         #  cycle is a dictionary {simplexindex:coeff} representing a cycle.
-
-        # TODO: print cycle nicely. (handle non-simple cases too?)
-        pass
+        G = nx.DiGraph()
+        edges = []
+        for simplexindex, coeff in cycle.items():
+            vlist = self.get_simplex_vlist(simplexindex)
+            if coeff > 0:
+                edges.append((vlist[0],vlist[1]))
+            elif coeff < 0:
+                edges.append((vlist[1],vlist[0]))
+        G.add_edges_from(edges)
+        for simple_cycle in nx.simple_cycles(G):
+            print(simple_cycle)
 
 
     def context_vectorize_1_cycle(self, cycle, maxbirth=np.inf, nbhd:list=None):
@@ -335,7 +343,10 @@ class Filtration:
         print(x_vec)
         print(y_vec)
 
-        print(self.context_vector_to_1_cycle(x_vec, nbhd=nbhd))
+        cycle = self.context_vector_to_1_cycle(x_vec, nbhd=nbhd)
+        print(cycle)
+
+        self.print_1_cycle(cycle)
 
 
         pass
