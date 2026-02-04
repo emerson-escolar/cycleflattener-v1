@@ -5,6 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = "==3.10.*"
 dependencies = [
+    "cplex",
     "docplex>=2.31.254",
     "numpy>=2.2.6",
     "pip>=26.0",
@@ -18,11 +19,11 @@ package = true
 [tool.uv.workspace]
 members = [
     ".",
-    ".",
 ]
 
 [tool.uv.sources]
 cycleflattener = { workspace = true }
+cplex = { path = "cplex_python_3.10" }
 
 [dependency-groups]
 dev = [
