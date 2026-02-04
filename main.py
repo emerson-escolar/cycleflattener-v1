@@ -4,13 +4,13 @@ def main():
     print("Hello from cycleflattener!")
     foo = cycleflattener.filtration.Filtration()
 
-    foo._load_vertices("./testdata/gen_sample_i2p.txt")
+    foo._load_vertices("./tests/testdata/gen_sample_i2p.txt")
     print(foo.vertex_coordinates)
 
-    foo._load_alpha_simplices("./testdata/gen_sample_alphamap.txt", maxbirth=9)
+    foo._load_alpha_simplices("./tests/testdata/gen_sample_alphamap.txt", maxbirth=9)
     print(foo.simplices)
 
-    foo._load_boundaries("./testdata/gen_sample_boundary.txt")
+    foo._load_boundaries("./tests/testdata/gen_sample_boundary.txt")
     print(foo.boundaries)
 
     print(foo.num_vertices)
@@ -40,7 +40,7 @@ def main():
 
     print(foo.context_exterior_angles_matrix().toarray())
 
-    foo._load_1_cycles("./testdata/gen_sample_1.txt")
+    foo._load_1_cycles("./tests/testdata/gen_sample_1.txt")
     print(foo.cycles)
 
     foo.print_1_cycle(foo.cycles[-1][0])

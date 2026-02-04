@@ -231,6 +231,7 @@ class Filtration:
                 x_vindex = __get_other(self.get_simplex_vlist(e1), v_vindex)
                 y_vindex = __get_other(self.get_simplex_vlist(e2), v_vindex)
 
+                print("edge pair:", (x_vindex, v_vindex), (v_vindex, y_vindex))
                 a = self.vertex_coordinates[x_vindex, :] - self.vertex_coordinates[v_vindex, :]
                 b = self.vertex_coordinates[v_vindex, :] - self.vertex_coordinates[y_vindex, :]
                 angle = compute_angle(a,b)
@@ -345,6 +346,7 @@ class Filtration:
                                         path="qp")
         solution, x_vec, y_vec = angleoptimizer.solve()
 
+        print(solution)
         print("solution value:", solution.objective_value)
         print(x_vec)
         print(y_vec)

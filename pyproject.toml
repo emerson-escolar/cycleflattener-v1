@@ -29,4 +29,5 @@ cplex = { path = "cplex_python_3.10" }
 [dependency-groups]
 dev = [
     "cycleflattener",
+    "pytest>=9.0.2",
 ]
