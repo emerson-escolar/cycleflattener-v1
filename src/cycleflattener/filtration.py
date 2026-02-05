@@ -59,13 +59,13 @@ class Filtration:
         return max(self.get_simplex_birth(simplexindex)
                    for simplexindex in range(self.num_simplices))
 
-    def _load_vertices(self, fname: str):
+    def load_vertices(self, fname: str):
         # expects "i2p" file
         # format: vertexindex x y z r
         self.vertex_coordinates = np.loadtxt(fname, usecols=[1, 2, 3])
 
 
-    def _load_alpha_simplices(self, fname:str, maxbirth=np.inf):
+    def load_alpha_simplices(self, fname:str, maxbirth=np.inf):
         # expects "alphamap" file
         # format: dim birth (comma-separated vertex indices)
 
@@ -83,7 +83,7 @@ class Filtration:
             self.simplices = list(__alphamap_processor(ifile))
 
 
-    def _load_1_cycles(self, fname:str):
+    def load_1_cycles(self, fname:str):
         # expects: optiperslp generators format
         # only works for dimension 1 cycles.
 
@@ -121,7 +121,7 @@ class Filtration:
         return { frozenset(self.get_simplex_vlist(simplexindex)) : simplexindex
                  for simplexindex in edges }
 
-    def _load_boundaries(self, fname:str):
+    def load_boundaries(self, fname:str):
         # expects "boundary" file
         # format: simplexindex : {(simplexindex, coeff), ... }
 
