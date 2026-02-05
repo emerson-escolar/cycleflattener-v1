@@ -12,7 +12,9 @@ def list_to_lookupdict(x:list):
 
 def compute_angle(a, b):
     cos = np.inner(a,b) / (np.linalg.norm(a) * np.linalg.norm(b))
-    rad = np.arccos(cos)
+    clipped_cos = np.clip(cos, -1, 1)
+    assert np.isclose(clipped_cos, cos)
+    rad = np.arccos(clipped_cos)
     return rad
 
 class Filtration:
