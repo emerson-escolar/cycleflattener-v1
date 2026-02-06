@@ -156,4 +156,7 @@ class TestFiltrationLoaders:
 
 
     def test_triple(self, resource_filt):
-        print(resource_filt)
+        filt = resource_filt
+        print(filt)
+
+        assert filt.context_boundary_matrix(dim=0).shape == (0,4)
