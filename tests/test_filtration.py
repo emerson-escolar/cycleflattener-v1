@@ -160,3 +160,14 @@ class TestFiltrationLoaders:
         print(filt)
 
         assert filt.context_boundary_matrix(dim=0).shape == (0,4)
+
+        print(filt.context_boundary_matrix(dim=1).toarray())
+
+        angles_matrix = np.array([[0    ,0    ,0    ,0    ,0] ,
+                                  [0.5  ,0    ,0    ,0    ,0] ,
+                                  [0.5  ,0    ,0    ,0    ,0] ,
+                                  [0    ,0.5  ,0.5  ,0    ,0] ,
+                                  [0.75 ,0.75 ,0.75 ,0.75 ,0]]) * np.pi
+        angles_matrix += angles_matrix.T
+
+        assert(np.allclose(filt.context_exterior_angles_matrix().toarray(), angles_matrix))

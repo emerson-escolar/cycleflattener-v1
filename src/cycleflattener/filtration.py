@@ -213,14 +213,14 @@ class Filtration:
         vertices = self.get_simplexindices_satisfying(dim=0, maxbirth=maxbirth, nbhd=nbhd)
         vertices_tosubindex_dict = list_to_lookupdict(vertices)
 
+        csr_data = []
+        csr_row_indices = []
+        csr_col_indices = []
+
         bdd = self.context_boundary_matrix(1, maxbirth=maxbirth, nbhd=nbhd)
         for vertex_simplexindex in vertices:
             vertex_subindex = vertices_tosubindex_dict[vertex_simplexindex]
             coface_subindices = bdd[vertex_subindex].nonzero()[1]
-
-            csr_data = []
-            csr_row_indices = []
-            csr_col_indices = []
 
             v_vindex = self.vertex_simplexindex_to_vertexindex[vertex_simplexindex]
             def __get_other(vlist, toexclude):
