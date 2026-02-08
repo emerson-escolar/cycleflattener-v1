@@ -37,7 +37,7 @@ def resource_i2p():
     0 1 1 0 0
     1 1 0 0 0
     2 0 1 0 0
-    3 0 0 0 0
+    3 0 0 0.0001 0
     '''.rstrip()
     yield from writer(data, "i2p")
 
@@ -75,7 +75,7 @@ def resource_bdd():
 
 
 @pytest.fixture
-def resource_filt(resource_i2p, resource_alp, resource_bdd):
+def resource_filt(resource_i2p, resource_alp, resource_bdd) -> cf.Filtration:
     filt = cf.Filtration()
     filt.load_vertices(resource_i2p)
     filt.load_alpha_simplices(resource_alp)
@@ -157,11 +157,14 @@ class TestFiltrationLoaders:
 
     def test_triple(self, resource_filt):
         filt = resource_filt
-        print(filt)
 
         assert filt.context_boundary_matrix(dim=0).shape == (0,4)
 
-        print(filt.context_boundary_matrix(dim=1).toarray())
+        bdd1 = np.array([[-1 ,-1 ,0  ,0  , 0],
+                         [1  ,0  ,1  ,0  ,-1],
+                         [0  ,1  ,0  ,1  , 1],
+                         [0  ,0  ,-1 ,-1 , 0]])
+        assert(np.allclose(filt.context_boundary_matrix(dim=1).toarray(), bdd1))
 
         angles_matrix = np.array([[0    ,0    ,0    ,0    ,0] ,
                                   [0.5  ,0    ,0    ,0    ,0] ,
@@ -169,5 +172,10 @@ class TestFiltrationLoaders:
                                   [0    ,0.5  ,0.5  ,0    ,0] ,
                                   [0.75 ,0.75 ,0.75 ,0.75 ,0]]) * np.pi
         angles_matrix += angles_matrix.T
-
         assert(np.allclose(filt.context_exterior_angles_matrix().toarray(), angles_matrix))
+
+        cycle = {4:1, 6:-1, 7:1, 5:-1}
+        print("optimization target:")
+        filt.print_1_cycle(cycle)
+
+        filt.compute_angleoptimal_homologous_cycle((cycle, (0.5,np.inf)), np.inf)

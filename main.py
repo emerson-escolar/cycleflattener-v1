@@ -43,6 +43,7 @@ def main():
     foo.load_1_cycles("./tests/testdata/gen_sample_1.txt")
     print(foo.cycles)
 
+    print("optimization target:")
     foo.print_1_cycle(foo.cycles[-1][0])
 
     foo.compute_angleoptimal_homologous_cycle(foo.cycles[-1], 100)

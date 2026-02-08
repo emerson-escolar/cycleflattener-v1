@@ -233,7 +233,7 @@ class Filtration:
                 x_vindex = __get_other(self.get_simplex_vlist(e1), v_vindex)
                 y_vindex = __get_other(self.get_simplex_vlist(e2), v_vindex)
 
-                print("edge pair:", (x_vindex, v_vindex), (v_vindex, y_vindex))
+                # print("edge pair:", (x_vindex, v_vindex), (v_vindex, y_vindex))
                 a = self.vertex_coordinates[x_vindex, :] - self.vertex_coordinates[v_vindex, :]
                 b = self.vertex_coordinates[v_vindex, :] - self.vertex_coordinates[y_vindex, :]
                 angle = compute_angle(a,b)
@@ -331,8 +331,8 @@ class Filtration:
         D2 = self.context_boundary_matrix(dim=2, nbhd=nbhd)
         z = self.context_vectorize_1_cycle(cycle, nbhd=nbhd)
 
-        Qhat = ssm.vstack((ssm.hstack((Q, Q)),
-                            ssm.hstack((Q, Q))))
+        Qhat = 0.5 * ssm.vstack((ssm.hstack((Q, Q)),
+                                 ssm.hstack((Q, Q))))
         E = ssm.identity(D2.shape[0], dtype=float, format="csr")
         A = ssm.hstack((E, -E, -D2, D2))
 
@@ -340,7 +340,6 @@ class Filtration:
         angleoptimizer.mdl.parameters.print_information(print_all=True)
 
         print("\n\n******************************\n")
-
         print("num x vars: ", angleoptimizer.num_x_variables)
         print("num y vars: ", angleoptimizer.num_y_variables)
 
@@ -349,14 +348,11 @@ class Filtration:
         solution, x_vec, y_vec = angleoptimizer.solve()
 
         print(solution)
-        print("solution value:", solution.objective_value)
-        print(x_vec)
-        print(y_vec)
+        # print("solution value:", solution.objective_value)
+        # print(x_vec)
+        # print(y_vec)
 
         cycle = self.context_vector_to_1_cycle(x_vec, nbhd=nbhd)
-        print(cycle)
-
+        print("Solution cycle (simplexindices): ", cycle)
+        print("Solution cycle as vertices:")
         self.print_1_cycle(cycle)
-
-
-        pass
