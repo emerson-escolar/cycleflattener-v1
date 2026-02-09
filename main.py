@@ -44,9 +44,12 @@ def main():
     print(foo.cycles)
 
     print("optimization target:")
-    foo.print_1_cycle(foo.cycles[-1][0])
+    cycle = foo.cycles[-1][0]
+    bd = foo.cycles[-1][1]
+    foo.print_1_cycle(cycle)
+    justbeforedeath = bd[1] - (bd[1]-bd[0]) * 0.00001
 
-    foo.compute_angleoptimal_homologous_cycle(foo.cycles[-1], 100)
+    foo.context_compute_angleoptimal_homologous_cycle(foo.cycles[-1], maxbirth=justbeforedeath)
 
 
 if __name__ == "__main__":

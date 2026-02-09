@@ -178,4 +178,4 @@ class TestFiltrationLoaders:
         print("optimization target:")
         filt.print_1_cycle(cycle)
 
-        filt.compute_angleoptimal_homologous_cycle((cycle, (0.5,np.inf)), np.inf)
+        filt.context_compute_angleoptimal_homologous_cycle((cycle, (0.5,np.inf)))

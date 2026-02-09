@@ -307,7 +307,8 @@ class Filtration:
         return cycle
 
 
-    def compute_angleoptimal_homologous_cycle(self, cycle_bd, eps):
+    def context_compute_angleoptimal_homologous_cycle(self, cycle_bd,
+                                                      maxbirth=np.inf, nbhd:list=None):
         # assumptions:
         # cycle_bd is a pair of a cycle and a bd_pair
         #  cycle is a dictionary {simplexindex:coeff} representing a cycle.
@@ -324,12 +325,9 @@ class Filtration:
                 vertex_vindices.append(vindex)
         vertex_vindices = list(set(vertex_vindices))
 
-        # get relevant nbhd:
-        nbhd = self.get_neighborhood_simplexindices(vertex_vindices, eps)
-
-        Q = self.context_exterior_angles_matrix(nbhd=nbhd)
-        D2 = self.context_boundary_matrix(dim=2, nbhd=nbhd)
-        z = self.context_vectorize_1_cycle(cycle, nbhd=nbhd)
+        Q = self.context_exterior_angles_matrix(maxbirth=maxbirth, nbhd=nbhd)
+        D2 = self.context_boundary_matrix(dim=2, maxbirth=maxbirth, nbhd=nbhd)
+        z = self.context_vectorize_1_cycle(cycle, maxbirth=maxbirth, nbhd=nbhd)
 
         Qhat = 0.5 * ssm.vstack((ssm.hstack((Q, Q)),
                                  ssm.hstack((Q, Q))))
@@ -352,7 +350,7 @@ class Filtration:
         # print(x_vec)
         # print(y_vec)
 
-        cycle = self.context_vector_to_1_cycle(x_vec, nbhd=nbhd)
+        cycle = self.context_vector_to_1_cycle(x_vec, maxbirth=maxbirth, nbhd=nbhd)
         print("Solution cycle (simplexindices): ", cycle)
         print("Solution cycle as vertices:")
         self.print_1_cycle(cycle)

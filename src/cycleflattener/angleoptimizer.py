@@ -62,6 +62,7 @@ class AngleOptimizer:
             csr_data = []
             csr_row_indices = []
             variables_half = variables[mid*j:mid*(j+1)]
+            i=-1
             for i, value in enumerate(solution.get_value_list(variables_half)):
                 if value != 0:
                     csr_data.append(value)
