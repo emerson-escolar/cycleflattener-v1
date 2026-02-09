@@ -1,4 +1,17 @@
 import cycleflattener
+import cycleflattener.utils
+
+import matplotlib.pyplot as plt
+
+def generate_slipper():
+    data = cycleflattener.utils.exampledata.generate_soleless_slipper(2, 1, 1)
+
+    fig = plt.figure(figsize=(8, 8))
+    ax = fig.add_subplot(111, projection="3d")
+    ax.scatter(data[:, 0], data[:, 1], data[:, 2], s=1, c="blue")
+    ax.set_zlim(-1, 1)
+    plt.show()
+
 
 def main():
     print("Hello from cycleflattener!")
@@ -52,5 +65,11 @@ def main():
     foo.context_compute_angleoptimal_homologous_cycle(foo.cycles[-1], maxbirth=justbeforedeath)
 
 
+
+
+
+
+
 if __name__ == "__main__":
     main()
+    generate_slipper()
