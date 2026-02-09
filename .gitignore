@@ -1,0 +1,27 @@
+# Project-specific ignores
+cplex_python_3.10
+
+
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+
+# Virtual environments
+.venv
+# other common virtual environment names (e.g., env, venv-name) can be added here if used
+
+
+# uv lock file
+# uv.lock SHOULD generally be committed to version control for applications.
+# Uncomment the following line ONLY if you are building a library and prefer to ignore it:
+# uv.lock
+
+
+# OS-generated files
+.DS_Store
+Thumbs.db
