@@ -1,5 +1,5 @@
 import numpy as np
-
+import pathlib
 
 
 def generate_soleless_slipper(r_x, r_y, r_z,
@@ -25,3 +25,9 @@ def generate_soleless_slipper(r_x, r_y, r_z,
             z = r_z * np.cos(theta)
             points.append([x,y,z])
     return np.array(points)
+
+
+def save_data_with_constant_radii(xyz_data:np.array, r:float, fpath:pathlib.Path):
+    data = np.concatenate( (xyz_data, np.array([r]*xyz_data.shape[0]).reshape(-1,1)),
+                           axis = 1 )
+    np.savetxt(fpath, data)
