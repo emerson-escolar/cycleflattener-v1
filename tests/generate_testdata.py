@@ -17,7 +17,7 @@ def generate_slipper(testdata_dir:pathlib.Path):
     slipper_dir = testdata_dir / "slipper"
     slipper_dir.mkdir(parents=True, exist_ok=True)
 
-    cue.save_data_with_constant_radii(data, 0, slipper_dir / "slipper_pc.txt")
+    cue.save_data_with_constant_radii(data, 0, slipper_dir / "slipper.txt")
 
 
 def main():

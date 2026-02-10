@@ -3,9 +3,9 @@ import pathlib
 
 
 def generate_soleless_slipper(r_x, r_y, r_z,
-                              back_sole_n = 100,
-                              front_sole_n = 100,
-                              front_rise_n = 20):
+                              back_sole_n = 40,
+                              front_sole_n = 40,
+                              front_rise_n = 15):
     front_limit = np.pi/2
 
     back_sole_angles = np.linspace(-front_limit, front_limit, back_sole_n)

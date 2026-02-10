@@ -254,8 +254,7 @@ class Filtration:
         return ssm.csr_matrix((csr_data, (csr_row_indices,csr_col_indices)),
                               shape=(len(edges),len(edges)))
 
-
-    def print_1_cycle(self, cycle):
+    def get_1_cycle_vertices(self, cycle) -> list[list[int]]:
         #  cycle is a dictionary {simplexindex:coeff} representing a cycle.
         G = nx.DiGraph()
         edges = []
@@ -266,7 +265,11 @@ class Filtration:
             elif coeff < 0:
                 edges.append((vlist[1],vlist[0]))
         G.add_edges_from(edges)
-        for simple_cycle in nx.simple_cycles(G):
+        return nx.simple_cycles(G)
+
+
+    def print_1_cycle(self, cycle):
+        for simple_cycle in self.get_1_cycle_vertices(cycle):
             print(simple_cycle)
 
 
@@ -350,7 +353,7 @@ class Filtration:
                                         path="qp")
         solution, x_vec, y_vec = angleoptimizer.solve()
 
-        print(solution)
+        # print(solution)
         # print("solution value:", solution.objective_value)
         # print(x_vec)
         # print(y_vec)
@@ -361,3 +364,6 @@ class Filtration:
         self.print_1_cycle(cycle)
 
         print("******************************")
+
+
+        return cycle
