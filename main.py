@@ -1,6 +1,7 @@
 import cycleflattener
 import cycleflattener.utils
 
+import numpy as np
 import matplotlib.pyplot as plt
 
 import pathlib
@@ -43,13 +44,16 @@ def main():
     filt.load_1_cycles(args.inputdir / f"gen_{args.inputname}_1.txt")
 
     # TODO: change optimization target to cycle with largest lifespan
-    print("optimization target:")
-    cycle = foo.cycles[-1][0]
-    bd = foo.cycles[-1][1]
-    filt.print_1_cycle(cycle)
-    justbeforedeath = bd[1] - (bd[1]-bd[0]) * 0.00001
+    lifespans = np.array(filt.get_lifespans())
+    idx = np.argmax(lifespans)
 
-    # filt.context_compute_angleoptimal_homologous_cycle(foo.cycles[-1], maxbirth=justbeforedeath)
+    print("optimization target:")
+    cycle = filt.cycles[idx][0]
+    bd = filt.cycles[idx][1]
+    filt.print_1_cycle(cycle)
+
+    filt.context_compute_angleoptimal_homologous_cycle(filt.cycles[idx],
+                                                       maxbirth=bd[0])
 
 
 
