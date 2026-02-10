@@ -95,13 +95,13 @@ class Filtration:
             cycle = {}
             for line in ifile:
                 line = line.strip()
-                print(line)
+                # print(line)
                 if line[0] == ';':
                     if len(cycle) != 0:
                         cycles.append( (cycle, bdpair) )
                         cycle = {}
                     lifespan_part = line.split()
-                    print(lifespan_part)
+                    # print(lifespan_part)
                     birth = float(lifespan_part[1])
                     death = float(lifespan_part[2])
                     bdpair = (birth, death)
@@ -116,6 +116,11 @@ class Filtration:
             cycle_bd = (cycle, bdpair)
             cycles.append( cycle_bd )
         self.cycles = cycles
+
+
+    def get_lifespans(self):
+        ans = [bd[1]-bd[0] for _,bd in self.cycles]
+        return ans
 
 
     def __vindex_fset_to_edge_simplexindex(self):
@@ -335,9 +340,9 @@ class Filtration:
         A = ssm.hstack((E, -E, -D2, D2))
 
         angleoptimizer = ao.AngleOptimizer(Qhat, A, z, "Angle Optimization via BQP")
-        angleoptimizer.mdl.parameters.print_information(print_all=True)
+        # angleoptimizer.mdl.parameters.print_information(print_all=True)
 
-        print("\n\n******************************\n")
+        print("******************************")
         print("num x vars: ", angleoptimizer.num_x_variables)
         print("num y vars: ", angleoptimizer.num_y_variables)
 
@@ -354,3 +359,5 @@ class Filtration:
         print("Solution cycle (simplexindices): ", cycle)
         print("Solution cycle as vertices:")
         self.print_1_cycle(cycle)
+
+        print("******************************")
