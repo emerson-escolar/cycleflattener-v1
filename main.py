@@ -3,73 +3,55 @@ import cycleflattener.utils
 
 import matplotlib.pyplot as plt
 
-def generate_slipper():
-    data = cycleflattener.utils.exampledata.generate_soleless_slipper(2, 1, 1)
+import pathlib
+import argparse
 
-    fig = plt.figure(figsize=(8, 8))
-    ax = fig.add_subplot(111, projection="3d")
-    ax.scatter(data[:, 0], data[:, 1], data[:, 2], s=1, c="blue")
-    ax.set_zlim(-1, 1)
-    plt.show()
+import textwrap
 
+
+def construct_parser() -> argparse.ArgumentParser:
+    desc = textwrap.dedent('''\
+    Program for performing angle optimization on the cycle with the largest lifespan.
+
+    Assumes that the files
+      gen_{args.inputname}_i2p.txt
+      gen_{args.inputname}_alphamap.txt
+      gen_{args.inputname}_boundary.txt
+      gen_{args.inputname}_1.txt
+    are in {args.inputdir} and reads them.
+    ''')
+
+    parser = argparse.ArgumentParser(description=desc,
+                                     formatter_class=argparse.RawDescriptionHelpFormatter)
+
+    parser.add_argument("inputname", type=str,
+                        help="name in string of data")
+    parser.add_argument("--inputdir", "-i", type=pathlib.Path,
+                        help="path to directory where inputs are stored",
+                        default=pathlib.Path.cwd())
+
+    return parser
 
 def main():
-    print("Hello from cycleflattener!")
-    foo = cycleflattener.filtration.Filtration()
+    args = construct_parser().parse_args()
 
-    foo.load_vertices("./tests/testdata/gen_sample_i2p.txt")
-    print(foo.vertex_coordinates)
+    filt = cycleflattener.filtration.Filtration()
 
-    foo.load_alpha_simplices("./tests/testdata/gen_sample_alphamap.txt", maxbirth=9)
-    print(foo.simplices)
+    filt.load_vertices(args.inputdir / f"gen_{args.inputname}_i2p.txt")
+    filt.load_alpha_simplices(args.inputdir / f"gen_{args.inputname}_alphamap.txt")
+    filt.load_boundaries(args.inputdir / f"gen_{args.inputname}_boundary.txt")
+    filt.load_1_cycles(args.inputdir / f"gen_{args.inputname}_1.txt")
 
-    foo.load_boundaries("./tests/testdata/gen_sample_boundary.txt")
-    print(foo.boundaries)
-
-    print(foo.num_vertices)
-
-    print(foo.get_neighborhood_simplexindices([1], eps=4))
-
-    print("dim 0 boundary")
-
-    print(foo.get_simplexindices_satisfying(dim=0))
-    print(foo.context_boundary_matrix(0).toarray())
-    print(foo.get_simplexindices_satisfying(dim=-11))
-
-
-    print("\ndim 1 boundary")
-
-    print(foo.get_simplexindices_satisfying(dim=1))
-    print(foo.context_boundary_matrix(1).toarray())
-    print(foo.get_simplexindices_satisfying(dim=0))
-
-    print("\ndim 2 boundary")
-
-    print(foo.get_simplexindices_satisfying(dim=2))
-    print(foo.context_boundary_matrix(2).toarray())
-    print(foo.get_simplexindices_satisfying(dim=1))
-
-    print("\n")
-
-    print(foo.context_exterior_angles_matrix().toarray())
-
-    foo.load_1_cycles("./tests/testdata/gen_sample_1.txt")
-    print(foo.cycles)
-
+    # TODO: change optimization target to cycle with largest lifespan
     print("optimization target:")
     cycle = foo.cycles[-1][0]
     bd = foo.cycles[-1][1]
-    foo.print_1_cycle(cycle)
+    filt.print_1_cycle(cycle)
     justbeforedeath = bd[1] - (bd[1]-bd[0]) * 0.00001
 
-    foo.context_compute_angleoptimal_homologous_cycle(foo.cycles[-1], maxbirth=justbeforedeath)
-
-
-
-
+    # filt.context_compute_angleoptimal_homologous_cycle(foo.cycles[-1], maxbirth=justbeforedeath)
 
 
 
 if __name__ == "__main__":
     main()
-    generate_slipper()
