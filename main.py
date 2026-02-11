@@ -34,7 +34,8 @@ def construct_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def plot_data_and_cycle(filt, cycle, color):
+def plot_data_and_cycle(filt, cycle, color,
+                        ofname:pathlib.Path, show=False):
     data = filt.vertex_coordinates
 
     fig = plt.figure(figsize=(8, 8))
@@ -44,7 +45,9 @@ def plot_data_and_cycle(filt, cycle, color):
         idxs = simp_cycle + [simp_cycle[0]]
         ax.plot(data[idxs, 0], data[idxs, 1], data[idxs, 2], c=color)
 
-    plt.show(block=True)
+    plt.savefig(ofname)
+    if show:
+        plt.show(block=True)
 
 def main():
     args = construct_parser().parse_args()
@@ -65,7 +68,8 @@ def main():
     bd = filt.cycles[idx][1]
     filt.print_1_cycle(cycle)
 
-    plot_data_and_cycle(filt, cycle, "red")
+    plot_data_and_cycle(filt, cycle, "red",
+                        args.inputdir / f"{args.inputname}_cyclebefore.pdf")
     plt.close()
 
     # TODO: setting for at what parameter value to optimize
@@ -75,7 +79,8 @@ def main():
     soln_cycle = filt.context_compute_angleoptimal_homologous_cycle(filt.cycles[idx],
                                                                     maxbirth=relbirth)
 
-    plot_data_and_cycle(filt, soln_cycle, "green")
+    plot_data_and_cycle(filt, soln_cycle, "green",
+                        args.inputdir / f"{args.inputname}_cycleafter.pdf")
 
 
 if __name__ == "__main__":
