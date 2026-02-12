@@ -8,18 +8,19 @@ def generate_slipper(testdata_dir:pathlib.Path,
                      r_x = 2, r_y = 1, r_z = 1,
                      back_sole_n = 40,
                      front_sole_n = 40,
-                     front_rise_n = 15):
+                     front_rise_n = 15,
+                     show=False):
     data = cue.generate_soleless_slipper(r_x, r_y, r_z,
                                          back_sole_n,
                                          front_sole_n,
                                          front_rise_n)
 
-    fig = plt.figure(figsize=(8, 8))
-    ax = fig.add_subplot(111, projection="3d")
-    ax.scatter(data[:, 0], data[:, 1], data[:, 2], s=1, c="blue")
-    ax.set_zlim(-1, 1)
-
-    plt.show()
+    if show:
+        fig = plt.figure(figsize=(8, 8))
+        ax = fig.add_subplot(111, projection="3d")
+        ax.scatter(data[:, 0], data[:, 1], data[:, 2], s=1, c="blue")
+        ax.set_zlim(-1, 1)
+        plt.show()
 
     slipper_dir = testdata_dir / "slipper"
     slipper_dir.mkdir(parents=True, exist_ok=True)
