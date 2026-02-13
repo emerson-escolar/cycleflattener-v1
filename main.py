@@ -75,6 +75,7 @@ def main():
     # TODO: setting for at what parameter value to optimize
     # relbirth = bd[0] + (bd[1]-bd[0]) * 0.9999 # just before death
     relbirth = bd[0] # at birth
+    relbirth = bd[0] + (bd[1]-bd[0]) * 0.5 # halfway
 
     soln_cycle = filt.context_compute_angleoptimal_homologous_cycle(filt.cycles[idx],
                                                                     maxbirth=relbirth)

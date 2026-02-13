@@ -351,9 +351,24 @@ class Filtration:
 
         angleoptimizer.mdl.export_as_lp(basename="quadratic_optimize",
                                         path="qp")
-        solution, x_vec, y_vec = angleoptimizer.solve()
+        print("EDITED")
+        # angleoptimizer.mdl.parameters.preprocessing.qtolin.set(1)
+        # angleoptimizer.mdl.set_time_limit(600)
+        # angleoptimizer.mdl.parameters.randomseed(42)
+        # angleoptimizer.mdl.parameters.parallel = 1
+        angleoptimizer.mdl.parameters.workmem = 2048*8
 
-        # print(solution)
+        angleoptimizer.mdl.parameters.mip.strategy.file = 3 # Node file on disk and compressed
+        angleoptimizer.mdl.parameters.mip.strategy.nodeselect = 2 # best-estimate search
+        angleoptimizer.mdl.parameters.mip.tolerances.absmipgap = np.pi * 0.1 # 18 deg total departure
+        angleoptimizer.mdl.parameters.mip.display = 2
+
+        # Display standard report plus parameter settings being tried
+        angleoptimizer.mdl.parameters.tune.display = 2
+
+        solution, x_vec, y_vec = angleoptimizer.solve(log_output=True)
+
+        print(solution)
         # print("solution value:", solution.objective_value)
         # print(x_vec)
         # print(y_vec)
