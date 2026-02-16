@@ -4,6 +4,26 @@ import matplotlib.pyplot as plt
 
 import pathlib
 
+import argparse
+import textwrap
+
+
+
+def construct_parser() -> argparse.ArgumentParser:
+    desc = textwrap.dedent('''\
+    Program for generating testdata in subfolder testdata.
+    ''')
+
+    parser = argparse.ArgumentParser(description=desc,
+                                     formatter_class=argparse.RawDescriptionHelpFormatter)
+
+    parser.add_argument("--bs", type=int, help="back_sole_n", default=20)
+    parser.add_argument("--fs", type=int, help="front_sole_n", default=20)
+    parser.add_argument("--fr", type=int, help="front_rise_n", default=10)
+
+    return parser
+
+
 def generate_slipper(testdata_dir:pathlib.Path,
                      r_x = 2, r_y = 1, r_z = 1,
                      back_sole_n = 40,
@@ -31,13 +51,13 @@ def generate_slipper(testdata_dir:pathlib.Path,
 
 
 def main():
+    args = construct_parser().parse_args()
+
     testdata_dir = pathlib.Path(__file__).resolve().parent / "testdata"
 
-    generate_slipper(testdata_dir)
-    generate_slipper(testdata_dir,
-                     back_sole_n=20,
-                     front_sole_n=20,
-                     front_rise_n=10)
+    generate_slipper(testdata_dir, back_sole_n=args.bs,
+                     front_sole_n=args.fs, front_rise_n=args.fr)
+
 
 
 if __name__ == "__main__":
