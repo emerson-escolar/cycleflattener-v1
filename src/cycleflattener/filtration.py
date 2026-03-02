@@ -316,7 +316,8 @@ class Filtration:
 
 
     def context_compute_angleoptimal_homologous_cycle(self, cycle_bd,
-                                                      maxbirth=np.inf, nbhd:list=None):
+                                                      maxbirth=np.inf, nbhd:list=None,
+                                                      qcr_shift:bool=False):
         # assumptions:
         # cycle_bd is a pair of a cycle and a bd_pair
         #  cycle is a dictionary {simplexindex:coeff} representing a cycle.
@@ -342,7 +343,19 @@ class Filtration:
         E = ssm.identity(D2.shape[0], dtype=float, format="csr")
         A = ssm.hstack((E, -E, -D2, D2))
 
-        angleoptimizer = ao.AngleOptimizer(Qhat, A, z, "Angle Optimization via BQP")
+        m = A.shape[1]
+        Qhat.resize((m,m))
+
+        if qcr_shift:
+            diag_list = [2*np.pi]*(2*A.shape[0]) + [1]*(m-2*A.shape[0])
+            Qhat += ssm.csr_matrix((diag_list, (range(m), range(m))), shape=(m,m))
+            b = -np.array(diag_list)
+            eigs = np.linalg.eigvalsh(Qhat.toarray())
+            print(f"Qhat min eigenvalue: {min(eigs)}, max eigenvalue: {max(eigs)}")
+        else:
+            b = None
+
+        angleoptimizer = ao.AngleOptimizer(Qhat, b, A, z, "Angle Optimization via BQP")
         # angleoptimizer.mdl.parameters.print_information(print_all=True)
 
         print("******************************")
@@ -365,6 +378,9 @@ class Filtration:
 
         # Display standard report plus parameter settings being tried
         angleoptimizer.mdl.parameters.tune.display = 2
+
+        # if qcr_shift:
+        #     angleoptimizer.mdl.parameters.optimalitytarget = 1  # globally optimal solution to a convex model.
 
         solution, x_vec, y_vec = angleoptimizer.solve(log_output=True)
 

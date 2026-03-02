@@ -30,6 +30,7 @@ def construct_parser() -> argparse.ArgumentParser:
     parser.add_argument("--inputdir", "-i", type=pathlib.Path,
                         help="path to directory where inputs are stored",
                         default=pathlib.Path.cwd())
+    parser.add_argument("--shift", action="store_true", help="shift eigenvalues by 2*pi")
 
     return parser
 
@@ -78,7 +79,8 @@ def main():
     relbirth = bd[0] + (bd[1]-bd[0]) * 0.5 # halfway
 
     soln_cycle = filt.context_compute_angleoptimal_homologous_cycle(filt.cycles[idx],
-                                                                    maxbirth=relbirth)
+                                                                    maxbirth=relbirth,
+                                                                    qcr_shift=args.shift)
 
     plot_data_and_cycle(filt, soln_cycle, "green",
                         args.inputdir / f"{args.inputname}_cycleafter.pdf")

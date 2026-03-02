@@ -1,12 +1,13 @@
 import scipy.sparse as ssm
 import docplex.mp.model
-
+import numpy as np
+from typing import Optional
 
 class AngleOptimizer:
     mdl: docplex.mp.model.Model
     z: ssm.csr_matrix
 
-    def __init__(self, Qhat:ssm.csr_matrix, A:ssm.csr_matrix, z:ssm.csr_matrix, model_name):
+    def __init__(self, Qhat:ssm.csr_matrix, b:Optional[np.array], A:ssm.csr_matrix, z:ssm.csr_matrix, model_name):
         self.A = A
         self.z = z
 
@@ -19,16 +20,19 @@ class AngleOptimizer:
         self.x_variables = self.mdl.binary_var_list(self.num_x_variables, name="x")
         self.y_variables = self.mdl.binary_var_list(self.num_y_variables, name="y")
 
+        variables = self.x_variables + self.y_variables
 
         # add objective:
         obj = 0
         Qhat_coo = Qhat.tocoo()
         for r, c, v in zip(Qhat_coo.row, Qhat_coo.col, Qhat_coo.data):
-            obj += self.x_variables[r] * v * self.x_variables[c]
+            obj += variables[r] * v * variables[c]
+        if b is not None:
+            for c, v in enumerate(b):
+                obj += v * variables[c]
         self.mdl.minimize(obj)
 
         # add constraints
-        variables = self.x_variables + self.y_variables
         for i in range(A.shape[0]):
             lhs = 0
             row = A[i,:].tocoo()
