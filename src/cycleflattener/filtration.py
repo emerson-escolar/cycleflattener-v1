@@ -327,7 +327,8 @@ class Filtration:
 
     def context_compute_angleoptimal_homologous_cycle(self, cycle_bd,
                                                       maxbirth=np.inf, nbhd:list=None,
-                                                      qcr_shift:bool=False):
+                                                      qcr_shift:bool=False,
+                                                      cplex_config_file=None):
         # assumptions:
         # cycle_bd is a pair of a cycle and a bd_pair
         #  cycle is a dictionary {simplexindex:coeff} representing a cycle.
@@ -365,7 +366,8 @@ class Filtration:
         else:
             b = None
 
-        angleoptimizer = ao.AngleOptimizer(Qhat, b, A, z, "Angle Optimization via BQP")
+        angleoptimizer = ao.AngleOptimizer(Qhat, b, A, z, "Angle Optimization via BQP",
+                                           cplex_config_file)
         # angleoptimizer.mdl.parameters.print_information(print_all=True)
 
         print("******************************")

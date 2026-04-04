@@ -32,6 +32,9 @@ def construct_parser() -> argparse.ArgumentParser:
                         default=pathlib.Path.cwd())
     parser.add_argument("--shift", action="store_true", help="shift eigenvalues by 2*pi")
 
+    parser.add_argument("--cplex_config_file", "-c", type=pathlib.Path,
+                        help="cplex config file", default=None)
+
     return parser
 
 
@@ -60,6 +63,13 @@ def main():
     filt.load_boundaries(args.inputdir / f"gen_{args.inputname}_boundary.txt")
     filt.load_1_cycles(args.inputdir / f"gen_{args.inputname}_1.txt")
 
+    # check cplex config file:
+    cf = None
+    if args.cplex_config_file.exists():
+        cf = [str(args.cplex_config_file), ]
+    else:
+        print("cplex_config_file ", args.cplex_config_file, " not found. Using defaults.")
+
     # optimization target is cycle with largest lifespan
     lifespans = np.array(filt.get_lifespans())
     idx = np.argmax(lifespans)
@@ -84,7 +94,8 @@ def main():
     # optimize
     soln_cycle = filt.context_compute_angleoptimal_homologous_cycle(filt.cycles[idx],
                                                                     maxbirth=relbirth,
-                                                                    qcr_shift=args.shift)
+                                                                    qcr_shift=args.shift,
+                                                                    cplex_config_file=cf)
 
     # report results
     plot_data_and_cycle(filt, soln_cycle, "green",

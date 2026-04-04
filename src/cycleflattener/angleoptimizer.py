@@ -7,11 +7,14 @@ class AngleOptimizer:
     mdl: docplex.mp.model.Model
     z: ssm.csr_matrix
 
-    def __init__(self, Qhat:ssm.csr_matrix, b:Optional[np.array], A:ssm.csr_matrix, z:ssm.csr_matrix, model_name):
+    def __init__(self, Qhat:ssm.csr_matrix, b:Optional[np.array], A:ssm.csr_matrix, z:ssm.csr_matrix,
+                 model_name, cplex_config_file=None):
         self.A = A
         self.z = z
 
         self.mdl = docplex.mp.model.Model(model_name)
+        if cplex_config_file is not None:
+            self.mdl.context.read_settings(cplex_config_file)
 
         assert( z.shape[0] == A.shape[0] )
         assert( z.shape[1] == 1 )
