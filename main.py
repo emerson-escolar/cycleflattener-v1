@@ -60,28 +60,33 @@ def main():
     filt.load_boundaries(args.inputdir / f"gen_{args.inputname}_boundary.txt")
     filt.load_1_cycles(args.inputdir / f"gen_{args.inputname}_1.txt")
 
-    # TODO: change optimization target to cycle with largest lifespan
+    # optimization target is cycle with largest lifespan
     lifespans = np.array(filt.get_lifespans())
     idx = np.argmax(lifespans)
-
-    print("optimization target:")
     cycle = filt.cycles[idx][0]
     bd = filt.cycles[idx][1]
-    filt.print_1_cycle(cycle)
-
-    plot_data_and_cycle(filt, cycle, "red",
-                        args.inputdir / f"{args.inputname}_cyclebefore.pdf")
-    plt.close()
 
     # TODO: setting for at what parameter value to optimize
     # relbirth = bd[0] + (bd[1]-bd[0]) * 0.9999 # just before death
     relbirth = bd[0] # at birth
     relbirth = bd[0] + (bd[1]-bd[0]) * 0.5 # halfway
 
+    # TODO: visualize triangles too
+    triangles = filt.context_triangles(relbirth)
+
+    # display optimization target
+    print("optimization target:")
+    filt.print_1_cycle(cycle)
+    plot_data_and_cycle(filt, cycle, "red",
+                        args.inputdir / f"{args.inputname}_cyclebefore.pdf")
+    plt.close()
+
+    # optimize
     soln_cycle = filt.context_compute_angleoptimal_homologous_cycle(filt.cycles[idx],
                                                                     maxbirth=relbirth,
                                                                     qcr_shift=args.shift)
 
+    # report results
     plot_data_and_cycle(filt, soln_cycle, "green",
                         args.inputdir / f"{args.inputname}_cycleafter.pdf")
 

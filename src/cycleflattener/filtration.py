@@ -177,6 +177,16 @@ class Filtration:
                 (self.simplices[i][type(self).KEY_birth] <= maxbirth) and
                 (self.simplices[i][type(self).KEY_dim] == dim)]
 
+    def context_triangles(self, maxbirth=np.inf, nbhd:list=None):
+        # Member functions with "context" depend on the context of
+        #  maxbirth and nbhd
+        # i.e.\ taken in the context of a subsmplicial complex defined by these parameters.
+        # For consistency, ensure that the same context is used!
+
+        return [ self.get_simplex_vlist(simplexindex) for simplexindex
+                 in self.get_simplexindices_satisfying(2, maxbirth=maxbirth, nbhd=nbhd) ]
+
+
 
     def get_boundary_coeff(self, query_simplexindex, face_simplexindex):
         return self.boundaries[query_simplexindex].get(query_simplexindex, 0)
