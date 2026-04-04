@@ -12,6 +12,9 @@ from collections import namedtuple
 
 from docplex.mp.model import Model
 from docplex.util.environment import get_environment
+
+import docplex.mp.context as dmc
+
 # ----------------------------------------------------------------------------
 # Initialize the problem data
 # ----------------------------------------------------------------------------
@@ -100,9 +103,19 @@ def build_diet_model(mdl, **kwargs):
 # ----------------------------------------------------------------------------
 
 if __name__ == '__main__':
+    mycontext = dmc.Context.make_default_context()
+    print(mycontext)
+    print(mycontext.cplex_parameters)
+    mycontext.cplex_parameters.print_information()
+
+    print()
+
     with Model(name="diet", log_output=True, float_precision=6) as mdl:
         build_diet_model(mdl, ints=True)
         mdl.print_information()
+
+        print(mdl.parameters)
+        print(type(mdl.parameters))
 
         s = mdl.solve()
         if s:
