@@ -21,6 +21,10 @@ def construct_parser() -> argparse.ArgumentParser:
     parser.add_argument("--fs", type=int, help="front_sole_n", default=20)
     parser.add_argument("--fr", type=int, help="front_rise_n", default=10)
 
+    parser.add_argument("--outputdir", "-o", type=pathlib.Path,
+                        help="path to directory where to save output",
+                        default=pathlib.Path(__file__).resolve().parent / "testdata")
+
     return parser
 
 
@@ -53,7 +57,7 @@ def generate_slipper(testdata_dir:pathlib.Path,
 def main():
     args = construct_parser().parse_args()
 
-    testdata_dir = pathlib.Path(__file__).resolve().parent / "testdata"
+    testdata_dir = args.outputdir
 
     generate_slipper(testdata_dir, back_sole_n=args.bs,
                      front_sole_n=args.fs, front_rise_n=args.fr)
