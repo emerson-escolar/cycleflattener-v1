@@ -28,7 +28,7 @@ def construct_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def generate_slipper(testdata_dir:pathlib.Path,
+def generate_slipper(outputdir:pathlib.Path,
                      r_x = 2, r_y = 1, r_z = 1,
                      back_sole_n = 40,
                      front_sole_n = 40,
@@ -47,20 +47,16 @@ def generate_slipper(testdata_dir:pathlib.Path,
         plt.show()
 
     name = f"slipper_{r_x}_{r_y}_{r_z}_{back_sole_n}_{front_sole_n}_{front_rise_n}"
-    slipper_dir = testdata_dir / name
-    slipper_dir.mkdir(parents=True, exist_ok=True)
+    outputdir.mkdir(parents=True, exist_ok=True)
 
     fname = f"{name}.txt"
-
-    cue.save_data_with_constant_radii(data, 0, slipper_dir / fname)
+    cue.save_data_with_constant_radii(data, 0, outputdir / fname)
 
 
 def main():
     args = construct_parser().parse_args()
 
-    testdata_dir = args.outputdir
-
-    generate_slipper(testdata_dir, back_sole_n=args.bs,
+    generate_slipper(args.outputdir, back_sole_n=args.bs,
                      front_sole_n=args.fs, front_rise_n=args.fr)
 
 
