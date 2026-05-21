@@ -39,7 +39,11 @@ def construct_parser() -> argparse.ArgumentParser:
                         help="cplex config file", default=None)
 
     parser.add_argument("--timelimit", "-t", type=int,
-                        help="Sets the maximum time, in seconds, for a call to an optimizer. Overrides value in cplex_config_file",
+                        help="Sets the maximum time, in seconds, for one call to the optimizer. Overrides value in cplex_config_file",
+                        default=None)
+
+    parser.add_argument("--nsolves", "-n", type=int,
+                        help="Number of times to call the optimizer.",
                         default=None)
 
     return parser
@@ -107,7 +111,7 @@ def main():
                                                                               export_file=args.outputdir / f"{args.inputname}.lp",
                                                                               cplex_config_file=cf,
                                                                               timelimit=args.timelimit,
-                                                                              n_epoch=5)
+                                                                              n_epoch=args.nsolves)
 
     # report results
     for i, soln_cycle in enumerate(soln_cycles):

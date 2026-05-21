@@ -42,7 +42,7 @@ UUID=$(uv run -p 3.14 --no-project -m uuid -u uuid7)
 for timeLimit in 5; do
     optiOutDir=$replDir/$FOLDER/$(printf "%03d" $timeLimit)sec_$UUID
     mkdir $optiOutDir
-    /usr/bin/time -v uv run main.py -i $replDir/$FOLDER -o $optiOutDir $DATA -c ./cplex_config_60s_mem_18deg.py -t $timeLimit 2>&1 | tee $optiOutDir/output.log
+    /usr/bin/time -v uv run main.py -i $replDir/$FOLDER -o $optiOutDir $DATA -c ./cplex_config_60s_mem_18deg.py -t $timeLimit -n 5 2>&1 | tee $optiOutDir/output.log
 done
 
 cd $origDir

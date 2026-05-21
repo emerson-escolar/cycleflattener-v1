@@ -411,7 +411,7 @@ class Filtration:
 
             cycle = self.context_vector_to_1_cycle(x_vec, maxbirth=maxbirth, nbhd=nbhd)
             # print("Solution cycle (simplexindices): ", cycle)
-            print("Solution cycle after {i+1} solves, as vertices:")
+            print(f"Solution cycle after {i+1} solves, as vertices:")
             self.print_1_cycle(cycle)
 
             print("******************************")
