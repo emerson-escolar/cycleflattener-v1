@@ -30,10 +30,17 @@ def construct_parser() -> argparse.ArgumentParser:
     parser.add_argument("--inputdir", "-i", type=pathlib.Path,
                         help="path to directory where inputs are stored",
                         default=pathlib.Path.cwd())
+    parser.add_argument("--outputdir", "-o", type=pathlib.Path,
+                        help="path to directory where outputs are stored",
+                        default=pathlib.Path.cwd())
     parser.add_argument("--shift", action="store_true", help="shift eigenvalues by 2*pi")
 
     parser.add_argument("--cplex_config_file", "-c", type=pathlib.Path,
                         help="cplex config file", default=None)
+
+    parser.add_argument("--timelimit", "-t", type=int,
+                        help="Sets the maximum time, in seconds, for a call to an optimizer. Overrides value in cplex_config_file",
+                        default=None)
 
     return parser
 
@@ -63,6 +70,8 @@ def main():
     filt.load_boundaries(args.inputdir / f"gen_{args.inputname}_boundary.txt")
     filt.load_1_cycles(args.inputdir / f"gen_{args.inputname}_1.txt")
 
+    args.outputdir.mkdir(exist_ok=True, parents=True)
+
     # check cplex config file:
     cf = None
     if args.cplex_config_file.exists():
@@ -88,18 +97,19 @@ def main():
     print("optimization target:")
     filt.print_1_cycle(cycle)
     plot_data_and_cycle(filt, cycle, "red",
-                        args.inputdir / f"{args.inputname}_cyclebefore.pdf")
+                        args.outputdir / f"{args.inputname}_cyclebefore.pdf")
     plt.close()
 
     # optimize
     soln_cycle = filt.context_compute_angleoptimal_homologous_cycle(filt.cycles[idx],
                                                                     maxbirth=relbirth,
                                                                     qcr_shift=args.shift,
-                                                                    cplex_config_file=cf)
+                                                                    cplex_config_file=cf,
+                                                                    timelimit=args.timelimit)
 
     # report results
     plot_data_and_cycle(filt, soln_cycle, "green",
-                        args.inputdir / f"{args.inputname}_cycleafter.pdf")
+                        args.outputdir / f"{args.inputname}_cycleafter.pdf")
 
 
 if __name__ == "__main__":
