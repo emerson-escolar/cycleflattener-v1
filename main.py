@@ -101,15 +101,17 @@ def main():
     plt.close()
 
     # optimize
-    soln_cycle = filt.context_compute_angleoptimal_homologous_cycle(filt.cycles[idx],
-                                                                    maxbirth=relbirth,
-                                                                    qcr_shift=args.shift,
-                                                                    cplex_config_file=cf,
-                                                                    timelimit=args.timelimit)
+    soln_cycles = filt.context_compute_angleoptimal_homologous_cycle_repeated(filt.cycles[idx],
+                                                                             maxbirth=relbirth,
+                                                                             qcr_shift=args.shift,
+                                                                             cplex_config_file=cf,
+                                                                             timelimit=args.timelimit,
+                                                                             n_epoch=5)
 
     # report results
-    plot_data_and_cycle(filt, soln_cycle, "green",
-                        args.outputdir / f"{args.inputname}_cycleafter.pdf")
+    for i, soln_cycle in enumerate(soln_cycles):
+        plot_data_and_cycle(filt, soln_cycle, "green",
+                            args.outputdir / f"{args.inputname}_cycleafter_{i+1}.pdf")
 
 
 if __name__ == "__main__":

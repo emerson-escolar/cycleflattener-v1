@@ -330,6 +330,20 @@ class Filtration:
                                                       qcr_shift:bool=False,
                                                       cplex_config_file=None,
                                                       timelimit=None):
+
+        return self.context_compute_angleoptimal_homologous_cycle_repeated(cycle_bd, maxbirth, nbhd,
+                                                                           qcr_shift,
+                                                                           cplex_config_file,
+                                                                           timelimit,
+                                                                           n_epoch=1)[0]
+
+
+    def context_compute_angleoptimal_homologous_cycle_repeated(self, cycle_bd,
+                                                               maxbirth=np.inf, nbhd:list=None,
+                                                               qcr_shift:bool=False,
+                                                               cplex_config_file=None,
+                                                               timelimit=None,
+                                                               n_epoch=1):
         # assumptions:
         # cycle_bd is a pair of a cycle and a bd_pair
         #  cycle is a dictionary {simplexindex:coeff} representing a cycle.
@@ -377,22 +391,25 @@ class Filtration:
 
         angleoptimizer.mdl.export_as_lp(basename="quadratic_optimize",
                                         path="qp")
-        print("EDITED")
+        # print("EDITED")
         # angleoptimizer.mdl.set_time_limit(600)
 
-        solution, x_vec, y_vec = angleoptimizer.solve(log_output=True)
+        solution_cycles = []
+        for i in range(n_epoch):
+            solution, x_vec, y_vec = angleoptimizer.solve(log_output=True)
 
-        print(solution)
-        # print("solution value:", solution.objective_value)
-        # print(x_vec)
-        # print(y_vec)
+            # print(solution)
+            print(f"solution value after {i+1} solves: {solution.objective_value}")
+            # print(x_vec)
+            # print(y_vec)
 
-        cycle = self.context_vector_to_1_cycle(x_vec, maxbirth=maxbirth, nbhd=nbhd)
-        print("Solution cycle (simplexindices): ", cycle)
-        print("Solution cycle as vertices:")
-        self.print_1_cycle(cycle)
+            cycle = self.context_vector_to_1_cycle(x_vec, maxbirth=maxbirth, nbhd=nbhd)
+            # print("Solution cycle (simplexindices): ", cycle)
+            print("Solution cycle after {i+1} solves, as vertices:")
+            self.print_1_cycle(cycle)
 
-        print("******************************")
+            print("******************************")
 
+            solution_cycles.append(cycle)
 
-        return cycle
+        return solution_cycles
