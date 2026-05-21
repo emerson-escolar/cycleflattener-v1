@@ -102,11 +102,12 @@ def main():
 
     # optimize
     soln_cycles = filt.context_compute_angleoptimal_homologous_cycle_repeated(filt.cycles[idx],
-                                                                             maxbirth=relbirth,
-                                                                             qcr_shift=args.shift,
-                                                                             cplex_config_file=cf,
-                                                                             timelimit=args.timelimit,
-                                                                             n_epoch=5)
+                                                                              maxbirth=relbirth,
+                                                                              qcr_shift=args.shift,
+                                                                              export_file=args.outputdir / f"{args.inputname}.lp",
+                                                                              cplex_config_file=cf,
+                                                                              timelimit=args.timelimit,
+                                                                              n_epoch=5)
 
     # report results
     for i, soln_cycle in enumerate(soln_cycles):

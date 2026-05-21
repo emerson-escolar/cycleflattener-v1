@@ -328,19 +328,24 @@ class Filtration:
     def context_compute_angleoptimal_homologous_cycle(self, cycle_bd,
                                                       maxbirth=np.inf, nbhd:list=None,
                                                       qcr_shift:bool=False,
+                                                      export_file=None,
                                                       cplex_config_file=None,
                                                       timelimit=None):
 
-        return self.context_compute_angleoptimal_homologous_cycle_repeated(cycle_bd, maxbirth, nbhd,
-                                                                           qcr_shift,
-                                                                           cplex_config_file,
-                                                                           timelimit,
+        return self.context_compute_angleoptimal_homologous_cycle_repeated(cycle_bd,
+                                                                           maxbirth=maxbirth,
+                                                                           nbhd=nbhd,
+                                                                           qcr_shift=qcr_shift,
+                                                                           export_file=export_file,
+                                                                           cplex_config_file=cplex_config_file,
+                                                                           timelimit=timelimit,
                                                                            n_epoch=1)[0]
 
 
     def context_compute_angleoptimal_homologous_cycle_repeated(self, cycle_bd,
                                                                maxbirth=np.inf, nbhd:list=None,
                                                                qcr_shift:bool=False,
+                                                               export_file=None,
                                                                cplex_config_file=None,
                                                                timelimit=None,
                                                                n_epoch=1):
@@ -389,8 +394,9 @@ class Filtration:
         print("num x vars: ", angleoptimizer.num_x_variables)
         print("num y vars: ", angleoptimizer.num_y_variables)
 
-        angleoptimizer.mdl.export_as_lp(basename="quadratic_optimize",
-                                        path="qp")
+        if export_file is not None:
+            angleoptimizer.mdl.export_as_lp(basename="quadratic_optimize",
+                                            path=str(export_file))
         # print("EDITED")
         # angleoptimizer.mdl.set_time_limit(600)
 
