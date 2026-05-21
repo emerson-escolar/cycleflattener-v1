@@ -46,10 +46,11 @@ def generate_slipper(testdata_dir:pathlib.Path,
         ax.set_zlim(-1, 1)
         plt.show()
 
-    slipper_dir = testdata_dir / "slipper"
+    name = f"slipper_{r_x}_{r_y}_{r_z}_{back_sole_n}_{front_sole_n}_{front_rise_n}"
+    slipper_dir = testdata_dir / name
     slipper_dir.mkdir(parents=True, exist_ok=True)
 
-    fname = f"slipper_{r_x}_{r_y}_{r_z}_{back_sole_n}_{front_sole_n}_{front_rise_n}.txt"
+    fname = f"{name}.txt"
 
     cue.save_data_with_constant_radii(data, 0, slipper_dir / fname)
 
