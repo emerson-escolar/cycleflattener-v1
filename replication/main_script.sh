@@ -1,5 +1,11 @@
 #!/bin/env bash
 
+BS=20
+FS=20
+FR=10
+timeLimit=5
+nSolve=5
+
 origDir=$(pwd)
 echo $origDir
 
@@ -9,9 +15,7 @@ echo $projectDir
 
 cd $projectDir
 
-BS=20
-FS=20
-FR=10
+
 DATA=slipper_2_1_1_${BS}_${FS}_${FR}
 
 
@@ -39,10 +43,9 @@ fi
 # but cplex uses python 3.10
 UUID=$(uv run -p 3.14 --no-project -m uuid -u uuid7)
 
-for timeLimit in 5; do
-    optiOutDir=$replDir/$FOLDER/$(printf "%03d" $timeLimit)sec_$UUID
-    mkdir $optiOutDir
-    /usr/bin/time -v uv run main.py -i $replDir/$FOLDER -o $optiOutDir $DATA -c ./cplex_config_60s_mem_18deg.py -t $timeLimit -n 5 2>&1 | tee $optiOutDir/output.log
-done
+
+optiOutDir=$replDir/$FOLDER/$(printf "%04d" $timeLimit)sec_$UUID
+mkdir $optiOutDir
+/usr/bin/time -v uv run main.py -i $replDir/$FOLDER -o $optiOutDir $DATA -c ./cplex_config_60s_mem_18deg.py -t $timeLimit -n $nSolve 2>&1 | tee $optiOutDir/output.log
 
 cd $origDir
