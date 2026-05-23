@@ -26,7 +26,7 @@ echo $FOLDER
 
 if [ ! -f "$replDir/$FOLDER/$DATA.txt" ]; then
     echo "$replDir/$FOLDER/$DATA.txt not found; generating data..."
-    uv run ./tests/generate_testdata.py --bs $BS --fs $FS --fr $FR -o $replDir/$FOLDER
+    uv run ./tests/generate_testdata.py slipper --bs $BS --fs $FS --fr $FR -o $replDir/$FOLDER
 else
     echo "$replDir/$FOLDER/$DATA.txt found."
 fi

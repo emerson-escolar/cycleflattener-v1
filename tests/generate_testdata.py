@@ -11,19 +11,24 @@ import textwrap
 
 def construct_parser() -> argparse.ArgumentParser:
     desc = textwrap.dedent('''\
-    Program for generating testdata in subfolder testdata.
+    Program for generating test data.
     ''')
+
+    common_parser = argparse.ArgumentParser(add_help = False)
 
     parser = argparse.ArgumentParser(description=desc,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
+    common_parser.add_argument("--outputdir", "-o", type=pathlib.Path,
+                                help="path to directory where to save output",
+                                default=pathlib.Path(__file__).resolve().parent / "testdata")
 
-    parser.add_argument("--bs", type=int, help="back_sole_n", default=20)
-    parser.add_argument("--fs", type=int, help="front_sole_n", default=20)
-    parser.add_argument("--fr", type=int, help="front_rise_n", default=10)
+    subparsers = parser.add_subparsers(dest="type")
 
-    parser.add_argument("--outputdir", "-o", type=pathlib.Path,
-                        help="path to directory where to save output",
-                        default=pathlib.Path(__file__).resolve().parent / "testdata")
+    slipper_parser = subparsers.add_parser('slipper', help='Generate soleless slipper', parents=[common_parser])
+    slipper_parser.add_argument("--bs", type=int, help="back_sole_n", default=20)
+    slipper_parser.add_argument("--fs", type=int, help="front_sole_n", default=20)
+    slipper_parser.add_argument("--fr", type=int, help="front_rise_n", default=10)
+
 
     return parser
 
