@@ -75,7 +75,9 @@ def generate_circle(outputdir:pathlib.Path,
     rng = np.random.default_rng()
     data += rng.uniform(-epsilon, epsilon, (num, 3))
 
-    data = np.concatenate((base, data))
+    base[:,0:2] += rng.uniform(-epsilon, epsilon, (num, 2))
+
+    data = np.concatenate((data, base))
 
     if show:
         fig = plt.figure(figsize=(8, 8))
