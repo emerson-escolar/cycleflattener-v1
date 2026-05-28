@@ -10,6 +10,8 @@ import textwrap
 
 import numpy as np
 
+import Bio.PDB as pdb
+
 def construct_parser() -> argparse.ArgumentParser:
     desc = textwrap.dedent('''\
     Program for generating test data.
@@ -33,6 +35,14 @@ def construct_parser() -> argparse.ArgumentParser:
     circle_parser.add_argument("--num", type=int, help="half of total number of points", default=1000)
     circle_parser.add_argument("--epsilon", type=float, help="noise epsilon", default=0.2)
     circle_parser.add_argument("--radius", type=float, help="radius", default=1.0)
+
+    pdb_parser = subparsers.add_parser('pdb', help='Fetch pdb data', parents=[common_parser])
+    pdb_parser.add_argument("pdb", type=str, help="pdb code")
+    pdb_parser.add_argument("--pdbdir", type=pathlib.Path,
+                            help="path to directory where to save pdb files",
+                            default=pathlib.Path(__file__).resolve().parent)
+
+
 
     return parser
 
@@ -91,6 +101,37 @@ def generate_circle(outputdir:pathlib.Path,
     cue.save_data_with_constant_radii(data, 0, outputdir / fname)
 
 
+def generate_pdb_data(outputdir:pathlib.Path,
+                      pdb_code:str,
+                      local_pdb_dir:pathlib.Path,
+                      show=False):
+    # if local_pdb_dir is None:
+    #     local_pdb_dir=pathlib.Path.cwd()
+
+    pdbl = pdb.PDBList(pdb=str(local_pdb_dir))
+    fname = pdbl.retrieve_pdb_file(pdb_code, file_format="mmCif")
+    structure = pdb.MMCIFParser().get_structure(pdb_code, fname)
+
+    all_atoms = []
+    for model in structure:
+        for chain in model:
+            for residue in chain:
+                for atom in residue:
+                    all_atoms.append(atom.coord)
+    data = np.array(all_atoms)
+
+    if show:
+        fig = plt.figure(figsize=(8, 8))
+        ax = fig.add_subplot(111, projection="3d")
+        ax.scatter(data[:, 0], data[:, 1], data[:, 2], s=1, c="blue")
+        plt.show()
+
+    outputdir.mkdir(parents=True, exist_ok=True)
+    fname = f"pdb_{pdb_code}.txt"
+
+    cue.save_data_with_constant_radii(data, 0, outputdir / fname)
+
+
 def main():
     parser = construct_parser()
     args = parser.parse_args()
@@ -102,6 +143,9 @@ def main():
     elif args.type == "circle":
         generate_circle(args.outputdir, num=args.num, epsilon=args.epsilon, r=args.radius,
                         show=args.show)
+    elif args.type == "pdb":
+        generate_pdb_data(args.outputdir, pdb_code=args.pdb, local_pdb_dir=args.pdbdir,
+                          show=args.show)
     else:
         parser.print_help(sys.stderr)
 

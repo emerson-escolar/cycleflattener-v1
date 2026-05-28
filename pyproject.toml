@@ -5,6 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = "==3.10.*"
 dependencies = [
+    "biopython>=1.87",
     "cplex",
     "docplex>=2.31.254",
     "matplotlib>=3.10.8",
