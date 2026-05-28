@@ -41,8 +41,11 @@ fi
 # but cplex uses python 3.10
 UUID=$(uv run -p 3.14 --no-project -m uuid -u uuid7)
 
-optiOutDir=$replDir/$FOLDER/$(printf "%04d" $timeLimit)sec_$UUID
-mkdir $optiOutDir
-/usr/bin/time -v uv run main.py -i $replDir/$FOLDER -o $optiOutDir $DATA -c ./cplex_config_60s_mem_18deg.py -t $timeLimit -n $nSolve 2>&1 | tee $optiOutDir/output.log
+for RATIO in 0.1 0.2 0.4
+do
+    optiOutDir=$replDir/$FOLDER/$(printf "%04d" $timeLimit)sec_${RATIO}ratio_$UUID
+    mkdir $optiOutDir
+    /usr/bin/time -v uv run main.py -i $replDir/$FOLDER -o $optiOutDir $DATA -r ${RATIO} -c ./cplex_config_60s_mem_18deg.py -t $timeLimit -n $nSolve 2>&1 | tee $optiOutDir/output.log
+done
 
 cd $origDir

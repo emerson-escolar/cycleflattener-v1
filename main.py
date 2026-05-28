@@ -35,6 +35,10 @@ def construct_parser() -> argparse.ArgumentParser:
                         default=pathlib.Path.cwd())
     parser.add_argument("--shift", action="store_true", help="shift eigenvalues by 2*pi")
 
+    parser.add_argument("--lifespan_ratio", "-r", type=float,
+                        help="lifespan ratio r. Alpha complex constructed at b+(d-b)*r",
+                        default=0.5)
+
     parser.add_argument("--cplex_config_file", "-c", type=pathlib.Path,
                         help="cplex config file", default=None)
 
@@ -89,10 +93,7 @@ def main():
     cycle = filt.cycles[idx][0]
     bd = filt.cycles[idx][1]
 
-    # TODO: setting for at what parameter value to optimize
-    # relbirth = bd[0] + (bd[1]-bd[0]) * 0.9999 # just before death
-    relbirth = bd[0] # at birth
-    relbirth = bd[0] + (bd[1]-bd[0]) * 0.5 # halfway
+    relbirth = bd[0] + (bd[1]-bd[0]) * args.lifespan_ratio
 
     # TODO: visualize triangles too
     triangles = filt.context_triangles(relbirth)
