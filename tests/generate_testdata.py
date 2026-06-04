@@ -36,6 +36,12 @@ def construct_parser() -> argparse.ArgumentParser:
     circle_parser.add_argument("--epsilon", type=float, help="noise epsilon", default=0.2)
     circle_parser.add_argument("--radius", type=float, help="radius", default=1.0)
 
+    cylinder_parser = subparsers.add_parser('cylinder', help='Generate cylinder', parents=[common_parser])
+    cylinder_parser.add_argument("--num", type=int, help="number of points along surface", default=1000)
+    cylinder_parser.add_argument("--height", type=float, help="height", default=2.0)
+    cylinder_parser.add_argument("--radius", type=float, help="radius", default=1.0)
+    cylinder_parser.add_argument("--based", action="store_true", help="add additional points along the base boundary. This doubles the number of points.")
+
     pdb_parser = subparsers.add_parser('pdb', help='Fetch pdb data', parents=[common_parser])
     pdb_parser.add_argument("pdb", type=str, help="pdb code")
     pdb_parser.add_argument("--pdbdir", type=pathlib.Path,
@@ -101,6 +107,40 @@ def generate_circle(outputdir:pathlib.Path,
     cue.save_data_with_constant_radii(data, 0, outputdir / fname)
 
 
+
+
+def generate_cylinder(outputdir:pathlib.Path,
+                      num, h, r, based,
+                      show=False):
+    rng = np.random.default_rng()
+
+    data = np.zeros((num, 3))
+    theta = rng.uniform(-np.pi, np.pi, num)
+
+    data[:, 0] = r * np.cos(theta)
+    data[:, 1] = r * np.sin(theta)
+    data[:, 2] = rng.uniform(0, h, num)
+
+    if based:
+        base = np.zeros((num, 3))
+        theta = rng.uniform(-np.pi, np.pi, num)
+        base[:, 0] = r * np.cos(theta)
+        base[:, 1] = r * np.sin(theta)
+        data = np.concatenate((data, base))
+
+    if show:
+        fig = plt.figure(figsize=(8, 8))
+        ax = fig.add_subplot(111, projection="3d")
+        ax.scatter(data[:, 0], data[:, 1], data[:, 2], s=1, c="blue")
+        ax.set_zlim(-1, 1)
+        plt.show()
+
+    outputdir.mkdir(parents=True, exist_ok=True)
+    fname = f"cylinder_{h}_{r}_{num}.txt"
+    cue.save_data_with_constant_radii(data, 0, outputdir / fname)
+
+
+
 def generate_pdb_data(outputdir:pathlib.Path,
                       pdb_code:str,
                       local_pdb_dir:pathlib.Path,
@@ -143,6 +183,10 @@ def main():
     elif args.type == "circle":
         generate_circle(args.outputdir, num=args.num, epsilon=args.epsilon, r=args.radius,
                         show=args.show)
+    elif args.type == "cylinder":
+        generate_cylinder(args.outputdir, num=args.num, h=args.height, r=args.radius, based=args.based,
+                          show=args.show)
+
     elif args.type == "pdb":
         generate_pdb_data(args.outputdir, pdb_code=args.pdb, local_pdb_dir=args.pdbdir,
                           show=args.show)
