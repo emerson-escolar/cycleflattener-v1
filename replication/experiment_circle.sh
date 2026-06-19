@@ -44,7 +44,7 @@ UUID=$(uv run -p 3.14 --no-project -m uuid -u uuid7)
 if [[ "$(uname)" == "Darwin" ]]; then
     TIMESCRIPT=gtime
 else
-    TIMESCRIPT==/usr/bin/time
+    TIMESCRIPT=/usr/bin/time
 fi
 
 for RATIO in 0.1 0.2 0.4
