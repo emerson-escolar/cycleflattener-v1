@@ -7,10 +7,12 @@ requires-python = "==3.10.*"
 dependencies = [
     "biopython>=1.87",
     "cplex",
+    "dash>=4.4.0",
     "docplex>=2.31.254",
     "matplotlib>=3.10.8",
     "networkx>=3.4.2",
     "numpy>=2.2.6",
+    "pandas>=2.3.3",
     "pip>=26.0",
     "scipy>=1.15.3",
 ]

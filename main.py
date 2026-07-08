@@ -1,5 +1,5 @@
 import cycleflattener
-import cycleflattener.utils
+import cycleflattener.utils.viewer
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -55,6 +55,7 @@ def construct_parser() -> argparse.ArgumentParser:
 
 def plot_data_and_cycle(filt, cycle, color,
                         ofname:pathlib.Path, show=False):
+    #  cycle is a dictionary {simplexindex:coeff} representing a cycle.
     data = filt.vertex_coordinates
 
     fig = plt.figure(figsize=(8, 8))
@@ -118,6 +119,12 @@ def main():
     for i, soln_cycle in enumerate(soln_cycles):
         plot_data_and_cycle(filt, soln_cycle, "green",
                             args.outputdir / f"{args.inputname}_cycleafter_{i+1}.pdf")
+
+    #
+    cycles = [cycle, ]
+    cycles.extend(soln_cycles)
+    cycleflattener.utils.viewer.plotly_data_and_cycle(filt, cycles)
+    #
 
 
 if __name__ == "__main__":
