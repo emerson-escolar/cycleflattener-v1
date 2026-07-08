@@ -1,5 +1,6 @@
 import cycleflattener
 import cycleflattener.utils.viewer
+import cycleflattener.utils.saveload
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -120,11 +121,11 @@ def main():
         plot_data_and_cycle(filt, soln_cycle, "green",
                             args.outputdir / f"{args.inputname}_cycleafter_{i+1}.pdf")
 
-    #
-    cycles = [cycle, ]
-    cycles.extend(soln_cycles)
-    cycleflattener.utils.viewer.plotly_data_and_cycle(filt, cycles)
-    #
+
+    with open(args.outputdir / f"{args.inputname}_solutions.json", "w") as fp:
+        cycleflattener.utils.saveload.save_solution_cycles(bd, cycle, relbirth, soln_cycles, fp)
+
+
 
 
 if __name__ == "__main__":
