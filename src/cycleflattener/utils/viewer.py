@@ -26,6 +26,7 @@ def plotly_data_and_cycle(filt, cycles_with_annot, max_filtration_value):
     cycle_selector_d = dash.dcc.Dropdown(options, 0, id='cycle-selector-dropdown', multi=True,
                                          style={"width":"80%"})
 
+    # ********** filtration value slider (R2) **********
     filtration_value_d = dash.html.Div(dash.dcc.Slider(min=0, max=max_filtration_value, step=0.0001,
                                                        value=0, id='filtration-value-slider'),
                                        style={"width":"80%"})
@@ -34,9 +35,10 @@ def plotly_data_and_cycle(filt, cycles_with_annot, max_filtration_value):
     control_d = dash.html.Div([dash.html.H2('1 cycles selected:', id='cycle-selector-title'),
                                cycle_selector_d,
                                dash.html.Br(),
-                               dash.html.H2('Filtration Value:'),
+                               dash.html.H2('Filtration Value:', id="filtration-value-title"),
                                filtration_value_d,
-                               dash.html.Div("hellO", id='dd-output-container')])
+                               dash.html.Br(),
+                               dash.html.Div("Warning: only triangles displayed.", id='dd-output-container')])
 
 
     app = dash.Dash()
@@ -57,8 +59,14 @@ def plotly_data_and_cycle(filt, cycles_with_annot, max_filtration_value):
             num = 1
         else:
             num = len(values)
-
         return f"{num} cycle{'' if num==1 else 's'} selected:"
+
+    @app.callback(
+        dash.Output('filtration-value-title', "children"),
+        dash.Input("filtration-value-slider", "value")
+    )
+    def update_filtration_value_text(value):
+        return f"Filtration value {value} selected:"
 
 
     @app.callback(
@@ -76,8 +84,7 @@ def plotly_data_and_cycle(filt, cycles_with_annot, max_filtration_value):
             if value == 0:
                 color = "red"
             else:
-                color = "green"
-
+                color = "blue"
             for simp_cycle in filt.get_1_cycle_vertices(cycles[value]):
                 idxs = simp_cycle + [simp_cycle[0]]
                 linedata = pd.DataFrame(data.iloc[idxs,:])
@@ -85,6 +92,7 @@ def plotly_data_and_cycle(filt, cycles_with_annot, max_filtration_value):
 
                 figdata += px.line_3d(linedata, x="x", y="y", z="z",
                                       color="colors", color_discrete_map="identity",
+
                                       height=1600).data
                 print("added object of type:", type(figdata[-1]))
             return figdata
@@ -99,6 +107,7 @@ def plotly_data_and_cycle(filt, cycles_with_annot, max_filtration_value):
         figure=go.Figure(data = figdata)
         figure.update_layout(margin=dict(l=20, r=20, t=20, b=20))
         figure.update_traces(marker_size = 2)
+        figure.update_traces(line=dict(width=8))
 
         triangles = np.array(filt.context_triangles(filt_v))
         print(triangles.shape)
@@ -110,7 +119,8 @@ def plotly_data_and_cycle(filt, cycles_with_annot, max_filtration_value):
                           z=data.loc[:,"z"],
                           i=triangles[:,0],
                           j=triangles[:,1],
-                          k=triangles[:,2])
+                          k=triangles[:,2],
+                          opacity=0.5, color="yellow")
 
         return figure
 
