@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
-NUM=300
+NUM=500
 RADIUS=1.0
 HEIGHT=2.0
 timeLimit=5
-nSolve=20
+nSolve=3
 
 origDir=$(pwd)
 echo $origDir

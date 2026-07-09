@@ -419,7 +419,7 @@ class Filtration:
             print(f"SOLUTION after {i+1} solves:")
             print(f"  ||z{i+1}||_0: {len(cycle)}")
             print(f"  l(z{i+1}): {self.get_1_cycle_geometric_length(cycle)}")
-            print(f"  k(z{i+1}): {solution.objective_value}")
+            print(f"  k(z{i+1}): {solution.objective_value} ~ {solution.objective_value / np.pi} pi")
             print(f"  z_{i+1}, as vertices:")
             self.print_1_cycle(cycle)
             print("******************************")

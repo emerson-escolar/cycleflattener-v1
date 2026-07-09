@@ -3,8 +3,8 @@
 BS=20
 FS=20
 FR=10
-timeLimit=5
-nSolve=5
+timeLimit=1
+nSolve=3
 
 origDir=$(pwd)
 echo $origDir

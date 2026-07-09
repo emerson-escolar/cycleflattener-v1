@@ -11,7 +11,7 @@ context.cplex_parameters.mip.strategy.file = 1 # Node file in memory and compres
 
 context.cplex_parameters.mip.strategy.nodeselect = 2 # best-estimate search
 context.cplex_parameters.mip.tolerances.absmipgap = np.pi * 0.1 # 18 deg total departure
-context.cplex_parameters.mip.display = 0
+context.cplex_parameters.mip.display = 1
 context.verbose = 0
 # if qcr_shift:
 #     context.cplex_parameters.optimalitytarget = 1  # globally optimal solution to a convex model.
