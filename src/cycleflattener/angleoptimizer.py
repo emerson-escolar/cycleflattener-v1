@@ -45,6 +45,20 @@ class AngleOptimizer:
                 lhs +=  v * variables[c]
             self.mdl.add_constraint( lhs == self.z[i,0] )
 
+        # add initial solution
+        warm_start = self.mdl.new_solution()
+        for i in range(self.z.shape[0]):
+            coeff = self.z[i,0]
+            if coeff >= 0:
+                warm_start.add_var_value(self.x_variables[i], coeff)
+            else:
+                warm_start.add_var_value(self.x_variables[i+self.z.shape[0]], -coeff)
+        self.mdl.add_mip_start(warm_start)
+        print(f"Warm start is valid: {warm_start.is_valid_solution()}")
+        # warm_start_obj = self.mdl.objective_expr.evaluate(warm_start)
+        # print(f"Warm start initial objective value: {warm_start_obj}.")
+
+
     @property
     def num_x_variables(self):
         return 2 * self.z.shape[0]

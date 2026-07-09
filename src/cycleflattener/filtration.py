@@ -277,6 +277,15 @@ class Filtration:
         G.add_edges_from(edges)
         return nx.simple_cycles(G)
 
+    def get_1_cycle_geometric_length(self, cycle) -> float:
+        #  cycle is a dictionary {simplexindex:coeff} representing a cycle.
+        ans = 0
+        for simplexindex, coeff in cycle.items():
+            vlist = self.get_simplex_vlist(simplexindex)
+            ans += np.linalg.norm(self.vertex_coordinates[vlist[0], :]
+                                  - self.vertex_coordinates[vlist[1], :], ord=2)
+        return ans
+
 
     def print_1_cycle(self, cycle):
         for simple_cycle in self.get_1_cycle_vertices(cycle):
@@ -401,21 +410,21 @@ class Filtration:
         # angleoptimizer.mdl.set_time_limit(600)
 
         solution_cycles = []
+        solution_values = []
         for i in range(n_epoch):
             solution, x_vec, y_vec = angleoptimizer.solve(log_output=True)
-
-            # print(solution)
-            print(f"solution value after {i+1} solves: {solution.objective_value}")
-            # print(x_vec)
-            # print(y_vec)
-
             cycle = self.context_vector_to_1_cycle(x_vec, maxbirth=maxbirth, nbhd=nbhd)
-            # print("Solution cycle (simplexindices): ", cycle)
-            print(f"Solution cycle after {i+1} solves, as vertices:")
-            self.print_1_cycle(cycle)
 
+            print("******************************")
+            print(f"SOLUTION after {i+1} solves:")
+            print(f"  ||z{i+1}||_0: {len(cycle)}")
+            print(f"  l(z{i+1}): {self.get_1_cycle_geometric_length(cycle)}")
+            print(f"  k(z{i+1}): {solution.objective_value}")
+            print(f"  z_{i+1}, as vertices:")
+            self.print_1_cycle(cycle)
             print("******************************")
 
             solution_cycles.append(cycle)
+            solution_values.append(solution.objective_value)
 
-        return solution_cycles
+        return solution_cycles, solution_values

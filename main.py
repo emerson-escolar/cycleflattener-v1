@@ -97,24 +97,29 @@ def main():
 
     relbirth = bd[0] + (bd[1]-bd[0]) * args.lifespan_ratio
 
-    # TODO: visualize triangles too
-    triangles = filt.context_triangles(relbirth)
-
     # display optimization target
+    print("******************************")
     print("optimization target:")
     filt.print_1_cycle(cycle)
     plot_data_and_cycle(filt, cycle, "red",
                         args.outputdir / f"{args.inputname}_cyclebefore.pdf")
     plt.close()
+    print("******************************")
+
+    # details:
+    print(f"n0: {filt.num_vertices}")
+    print(f"n1: {len(filt.get_simplexindices_satisfying(dim=1,maxbirth=relbirth))}")
+    print(f"n2: {len(filt.get_simplexindices_satisfying(dim=2,maxbirth=relbirth))}")
+    print(f"||z0||_0: {len(cycle)}")
+    print(f"l(z0): {filt.get_1_cycle_geometric_length(cycle)}")
+    print(f"[b,d): {bd}")
+    print(f"z0: {cycle}")
+    print("******************************")
+
+    print(f"r: {relbirth}")
 
     # optimize
-    soln_cycles = filt.context_compute_angleoptimal_homologous_cycle_repeated(filt.cycles[idx],
-                                                                              maxbirth=relbirth,
-                                                                              qcr_shift=args.shift,
-                                                                              export_file=args.outputdir / f"{args.inputname}.lp",
-                                                                              cplex_config_file=cf,
-                                                                              timelimit=args.timelimit,
-                                                                              n_epoch=args.nsolves)
+    soln_cycles, soln_values = filt.context_compute_angleoptimal_homologous_cycle_repeated(filt.cycles[idx], maxbirth=relbirth, qcr_shift=args.shift, export_file=args.outputdir / f"{args.inputname}.lp", cplex_config_file=cf, timelimit=args.timelimit, n_epoch=args.nsolves)
 
     # report results
     for i, soln_cycle in enumerate(soln_cycles):
