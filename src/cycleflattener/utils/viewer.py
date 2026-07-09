@@ -2,8 +2,9 @@ import dash
 import plotly.express as px
 import plotly.graph_objects as go
 import pandas as pd
+import numpy as np
 
-def plotly_data_and_cycle(filt, cycles_with_annot):
+def plotly_data_and_cycle(filt, cycles_with_annot, max_filtration_value):
     # cycles_with_annot is a pair (cycles, annots) of:
     #   cycles: a list of cycles (each cycle is dict {simplexindex:coeff})
     #   annots: a list of string annotations to label the selector.
@@ -25,7 +26,7 @@ def plotly_data_and_cycle(filt, cycles_with_annot):
     cycle_selector_d = dash.dcc.Dropdown(options, 0, id='cycle-selector-dropdown', multi=True,
                                          style={"width":"80%"})
 
-    filtration_value_d = dash.html.Div(dash.dcc.Slider(min=0, max=2, step=0.0001,
+    filtration_value_d = dash.html.Div(dash.dcc.Slider(min=0, max=max_filtration_value, step=0.0001,
                                                        value=0, id='filtration-value-slider'),
                                        style={"width":"80%"})
 
@@ -66,20 +67,12 @@ def plotly_data_and_cycle(filt, cycles_with_annot):
         dash.Input("filtration-value-slider", "value"),
         dash.State("3dGraph", "figure")
     )
-    def update_graph(b1, b2, old_figure):
-        triggered_id = dash.ctx.triggered_id
-        print("TRIGGER: ", triggered_id)
-        if triggered_id == "cycle-selector-dropdown" or triggered_id is None:
-            return update_cycle_selection(b1, old_figure)
-        elif triggered_id == "filtration-value-slider":
-            return update_filtration_value(b2, old_figure)
-
-
-    def update_cycle_selection(values, old_figure):
+    def update_graph(select_v, filt_v, old_figure):
         pointcloud = px.scatter_3d(data, x="x", y="y", z="z", height=1600)
         figdata = pointcloud.data
 
         def _process(value, figdata):
+            print("figdata type:", type(figdata))
             if value == 0:
                 color = "red"
             else:
@@ -93,24 +86,34 @@ def plotly_data_and_cycle(filt, cycles_with_annot):
                 figdata += px.line_3d(linedata, x="x", y="y", z="z",
                                       color="colors", color_discrete_map="identity",
                                       height=1600).data
+                print("added object of type:", type(figdata[-1]))
             return figdata
 
-        print("VALUES: ", values)
-        if type(values) is int:
-            figdata = _process(values,figdata)
+        print("VALUES: ", select_v)
+        if type(select_v) is int:
+            figdata = _process(select_v,figdata)
         else:
-            for value in values:
+            for value in select_v:
                 figdata = _process(value, figdata)
 
         figure=go.Figure(data = figdata)
         figure.update_layout(margin=dict(l=20, r=20, t=20, b=20))
         figure.update_traces(marker_size = 2)
 
+        triangles = np.array(filt.context_triangles(filt_v))
+        print(triangles.shape)
+        if len(triangles) == 0:
+            return figure
+
+        figure.add_mesh3d(x=data.loc[:,"x"],
+                          y=data.loc[:,"y"],
+                          z=data.loc[:,"z"],
+                          i=triangles[:,0],
+                          j=triangles[:,1],
+                          k=triangles[:,2])
+
         return figure
 
-
-    def update_filtration_value(value, old_figure):
-        return old_figure
 
 
     app.run(debug=True)

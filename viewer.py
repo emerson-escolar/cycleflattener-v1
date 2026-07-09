@@ -59,12 +59,12 @@ def main():
     d = data['original_cycle_death']
     annots = [f"[{b}, {d})", ]
 
-    for d in data["solution_cycles"]:
-        cycles.append(make_keys_int(d))
+    for cycle in data["solution_cycles"]:
+        cycles.append(make_keys_int(cycle))
         annots.append(f"@ {data['filtration_value']}")
 
 
-    cycleflattener.utils.viewer.plotly_data_and_cycle(filt, (cycles, annots))
+    cycleflattener.utils.viewer.plotly_data_and_cycle(filt, (cycles, annots), d)
 
 
 if __name__ == "__main__":
