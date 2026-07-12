@@ -1,6 +1,6 @@
 import cycleflattener
 import cycleflattener.utils.viewer
-import cycleflattener.utils.saveload
+import cycleflattener.utils.saveload as sl
 
 import json
 
@@ -32,6 +32,8 @@ def construct_parser() -> argparse.ArgumentParser:
                         default=pathlib.Path.cwd())
     parser.add_argument("cyclesfile", type=pathlib.Path,
                         help="name of solution cycles file")
+    parser.add_argument("--version", "-r", type=int,
+                        help="cycle files veRsion", default=1)
     return parser
 
 
@@ -46,17 +48,31 @@ def main():
     filt.load_boundaries(args.inputdir / f"gen_{args.inputname}_boundary.txt")
     filt.load_1_cycles(args.inputdir / f"gen_{args.inputname}_1.txt")
 
-    with open(args.cyclesfile) as fp:
-        data = cycleflattener.utils.saveload.read_solution_cycles_v1(fp)
+    if args.version == 1:
+        with open(args.cyclesfile) as fp:
+            data = sl.CyclesFileV1.model_validate_json(fp.read())
 
-    cycles = [data.original_cycle, ]
-    b = data.original_cycle_birth
-    d = data.original_cycle_death
-    annots = [f"[{b}, {d})", ]
+        cycles = [data.original_cycle, ]
+        b = data.original_cycle_birth
+        d = data.original_cycle_death
+        annots = [f"[{b}, {d})", ]
 
-    for cycle in data.solution_cycles:
-        cycles.append(cycle)
-        annots.append(f"@ {data.filtration_value}")
+        for cycle in data.solution_cycles:
+            cycles.append(cycle)
+            annots.append(f"@ {data.filtration_value}")
+
+    elif args.version == 2:
+        with open(args.cyclesfile) as fp:
+            data = sl.CyclesFileV2.model_validate_json(fp.read())
+            cycles_p = data.cycles
+
+            b = cycles_p[0].birth
+            d = cycles_p[0].death
+            annots = [f"[{b}, {d}) l={cycles_p[0].length} k={cycles_p[0].kappa}", ]
+
+            for i in range(1, len(cycles_p)):
+                annots.append(f"@ {cycles_p[i].filtration_value} l={cycles_p[i].length} k={cycles_p[i].kappa}")
+            cycles = [x.cycle for x in cycles_p]
 
 
     cycleflattener.utils.viewer.plotly_data_and_cycle(filt, (cycles, annots), d)

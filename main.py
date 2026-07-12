@@ -118,6 +118,12 @@ def main():
 
     print(f"r: {relbirth}")
 
+    cycles_v2 = [sl.CycleV2(birth=bd[0],
+                            death=bd[1],
+                            length=filt.get_1_cycle_geometric_length(cycle),
+                            kappa=filt.get_1_cycle_total_absolute_curvature(cycle),
+                            cycle=cycle), ]
+
     # optimize
     soln_cycles, soln_values = filt.context_compute_angleoptimal_homologous_cycle_repeated(filt.cycles[idx], maxbirth=relbirth, qcr_shift=args.shift, export_file=args.outputdir / f"{args.inputname}.lp", cplex_config_file=cf, timelimit=args.timelimit, n_epoch=args.nsolves)
 
@@ -126,10 +132,21 @@ def main():
         plot_data_and_cycle(filt, soln_cycle, "green",
                             args.outputdir / f"{args.inputname}_cycleafter_{i+1}.pdf")
 
+        print(f"z_{i+1}: computed kappa: {soln_values[i]} and {filt.get_1_cycle_total_absolute_curvature(soln_cycle)}")
+
+        cycle_p = sl.CycleV2(filtration_value=relbirth,
+                             length=filt.get_1_cycle_geometric_length(soln_cycle),
+                             kappa=soln_values[i],
+                             cycle=soln_cycle)
+        cycles_v2.append(cycle_p)
+
 
     with open(args.outputdir / f"{args.inputname}_solutions.json", "w") as fp:
         sl.save_solution_cycles_v1(bd, cycle, relbirth, soln_cycles, fp)
 
+    with open(args.outputdir / f"{args.inputname}_solutions_v2.json", "w") as fp:
+        fp.write(sl.CyclesFileV2(original_cycle_indices=[0,],
+                                 cycles=cycles_v2).model_dump_json(indent=2))
 
 
 
