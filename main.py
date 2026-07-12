@@ -1,6 +1,6 @@
 import cycleflattener
 import cycleflattener.utils.viewer
-import cycleflattener.utils.saveload
+import cycleflattener.utils.saveload as sl
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -128,7 +128,7 @@ def main():
 
 
     with open(args.outputdir / f"{args.inputname}_solutions.json", "w") as fp:
-        cycleflattener.utils.saveload.save_solution_cycles_v1(bd, cycle, relbirth, soln_cycles, fp)
+        sl.save_solution_cycles_v1(bd, cycle, relbirth, soln_cycles, fp)
 
 
 

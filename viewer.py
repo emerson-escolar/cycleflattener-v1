@@ -35,9 +35,6 @@ def construct_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def make_keys_int(adict):
-    return {int(k):v for k,v in adict.items()}
-
 
 def main():
     args = construct_parser().parse_args()
@@ -52,13 +49,13 @@ def main():
     with open(args.cyclesfile) as fp:
         data = cycleflattener.utils.saveload.read_solution_cycles_v1(fp)
 
-    cycles = [make_keys_int(data.original_cycle), ]
+    cycles = [data.original_cycle, ]
     b = data.original_cycle_birth
     d = data.original_cycle_death
     annots = [f"[{b}, {d})", ]
 
     for cycle in data.solution_cycles:
-        cycles.append(make_keys_int(cycle))
+        cycles.append(cycle)
         annots.append(f"@ {data.filtration_value}")
 
 
