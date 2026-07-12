@@ -63,15 +63,15 @@ def main():
 
     elif args.version == 2:
         with open(args.cyclesfile) as fp:
-            data = sl.CyclesFileV2.model_validate_json(fp.read())
+            data = sl.CyclesFileV2(**json.load(fp))
             cycles_p = data.cycles
 
             b = cycles_p[0].birth
             d = cycles_p[0].death
-            annots = [f"[{b}, {d}) l={cycles_p[0].length} k={cycles_p[0].kappa}", ]
+            annots = [f"orig [{b}, {d}) l={cycles_p[0].length} k={cycles_p[0].kappa}", ]
 
             for i in range(1, len(cycles_p)):
-                annots.append(f"@ {cycles_p[i].filtration_value} l={cycles_p[i].length} k={cycles_p[i].kappa}")
+                annots.append(f"opti @ {cycles_p[i].filtration_value} l={cycles_p[i].length} k={cycles_p[i].kappa}")
             cycles = [x.cycle for x in cycles_p]
 
 
