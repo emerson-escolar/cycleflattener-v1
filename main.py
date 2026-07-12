@@ -128,7 +128,7 @@ def main():
 
 
     with open(args.outputdir / f"{args.inputname}_solutions.json", "w") as fp:
-        cycleflattener.utils.saveload.save_solution_cycles(bd, cycle, relbirth, soln_cycles, fp)
+        cycleflattener.utils.saveload.save_solution_cycles_v1(bd, cycle, relbirth, soln_cycles, fp)
 
 
 

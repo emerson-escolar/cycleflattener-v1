@@ -50,18 +50,16 @@ def main():
     filt.load_1_cycles(args.inputdir / f"gen_{args.inputname}_1.txt")
 
     with open(args.cyclesfile) as fp:
-        data = json.load(fp)
+        data = cycleflattener.utils.saveload.read_solution_cycles_v1(fp)
 
-    print(data)
-
-    cycles = [make_keys_int(data["original_cycle"]), ]
-    b = data['original_cycle_birth']
-    d = data['original_cycle_death']
+    cycles = [make_keys_int(data.original_cycle), ]
+    b = data.original_cycle_birth
+    d = data.original_cycle_death
     annots = [f"[{b}, {d})", ]
 
-    for cycle in data["solution_cycles"]:
+    for cycle in data.solution_cycles:
         cycles.append(make_keys_int(cycle))
-        annots.append(f"@ {data['filtration_value']}")
+        annots.append(f"@ {data.filtration_value}")
 
 
     cycleflattener.utils.viewer.plotly_data_and_cycle(filt, (cycles, annots), d)
