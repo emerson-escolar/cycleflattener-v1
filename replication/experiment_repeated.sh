@@ -1,12 +1,19 @@
 #!/usr/bin/env zsh
 
 
-timeLimit=5
-nSolve=3
+timeLimit=1
+nSolve=15
 
 # name of data folder (inside replication directory) and input name
-FOLDER=C2_cylinder_2.0_1.0_500_019f4645-905d-7479-900d-ffd9195b399c
-DATA=cylinder_2.0_1.0_500
+# FOLDER=C2_cylinder_2.0_1.0_500_019f4645-905d-7479-900d-ffd9195b399c
+# DATA=cylinder_2.0_1.0_500
+
+# FOLDER=S1_slipper_2_1_1_20_20_10
+# DATA=slipper_2_1_1_20_20_10
+
+FOLDER=slipper_2_1_1_30_30_20
+DATA=slipper_2_1_1_30_30_20
+
 RATIO=0.2
 
 origDir=$(pwd)

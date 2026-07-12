@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-BS=20
-FS=20
-FR=10
+BS=30
+FS=30
+FR=20
 timeLimit=1
 nSolve=3
 
