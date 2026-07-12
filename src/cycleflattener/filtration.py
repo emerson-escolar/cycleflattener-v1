@@ -286,6 +286,20 @@ class Filtration:
                                   - self.vertex_coordinates[vlist[1], :], ord=2)
         return ans
 
+    def get_1_cycle_total_absolute_curvature(self, cycle) -> float:
+        maxbirth = max(self.get_simplex_birth(simplexindex) for simplexindex in cycle)
+
+        Q = self.context_exterior_angles_matrix(maxbirth=maxbirth)
+        z = self.context_vectorize_1_cycle(cycle, maxbirth=maxbirth)
+        z_abs = np.abs(z.todense())
+
+        # silence weird bug in M4 mac
+        # https://stackoverflow.com/questions/79792627/divide-by-zero-encountered-in-matmul-on-macos-m4-with-numpy-v2-0-0
+        with np.errstate(divide='ignore', over='ignore', invalid='ignore'):
+            ans = 0.5 * z_abs.T @ Q.todense() @ z_abs
+
+        return ans[0,0]
+
 
     def print_1_cycle(self, cycle):
         for simple_cycle in self.get_1_cycle_vertices(cycle):
