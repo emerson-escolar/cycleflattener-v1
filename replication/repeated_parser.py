@@ -94,7 +94,10 @@ def main():
         for k in ks:
             fp.write(f"{k / np.pi} \\pi\n")
 
+    print(f"Worst kappa: {max(ks)/np.pi} \\pi")
     print(f"Best kappa: {min(ks)/np.pi} \\pi")
+    print(f"Average kappa: {np.mean(ks)/np.pi} \\pi")
+    print(f"Stddev kappa: {np.std(ks)/np.pi} \\pi")
 
 
 
