@@ -1,10 +1,25 @@
 #!/usr/bin/env bash
 
-NUM=500
-RADIUS=1.0
-HEIGHT=2.0
-timeLimit=5
-nSolve=3
+# Created by argbash-init v2.11.0
+# Run 'argbash --strip user-content "experiment_cylinder.sh-parsing.m4" -o "experiment_cylinder.sh-parsing.sh"' to generate the 'experiment_cylinder.sh-parsing.sh' file.
+# If you need to make changes later, edit 'experiment_cylinder.sh-parsing.sh' directly, and regenerate by running
+# 'argbash --strip user-content "experiment_cylinder.sh-parsing.sh" -o "experiment_cylinder.sh-parsing.sh"'
+script_dir="$(cd "$(dirname "$(readlink -e "${BASH_SOURCE[0]}")")" && pwd)"
+. "${script_dir}/experiment_cylinder.sh-parsing.sh" || { echo "Couldn't find 'experiment_cylinder.sh-parsing.sh' parsing library in the '$script_dir' directory"; exit 1; }
+
+# vvv  PLACE YOUR CODE HERE  vvv
+# For example:
+printf 'Value of --%s: %s\n' 'timeLimit' "$_arg_timelimit"
+printf 'Value of --%s: %s\n' 'nSolve' "$_arg_nsolve"
+printf 'Value of --%s: %s\n' 'radius' "$_arg_radius"
+printf 'Value of --%s: %s\n' 'height' "$_arg_height"
+printf "Value of '%s': %s\\n" 'NUM' "$_arg_num"
+
+NUM="$_arg_num"
+RADIUS="$_arg_radius"
+HEIGHT="$_arg_height"
+timeLimit="$_arg_timelimit"
+nSolve="$_arg_nsolve"
 
 origDir=$(pwd)
 echo $origDir
@@ -24,7 +39,7 @@ echo $FOLDER
 
 if [ ! -f "$replDir/$FOLDER/$DATA.txt" ]; then
     echo "$replDir/$FOLDER/$DATA.txt not found; generating data..."
-    uv run ./tests/generate_testdata.py cylinder --num $NUM --radius $RADIUS --height $HEIGHT -o $replDir/$FOLDER
+    uv run ./tests/generate_testdata.py cylinder --num $NUM --radius_str $RADIUS --height_str $HEIGHT -o $replDir/$FOLDER
 else
     echo "$replDir/$FOLDER/$DATA.txt found."
 fi
@@ -56,3 +71,6 @@ do
 done
 
 cd $origDir
+
+
+# ^^^  TERMINATE YOUR CODE BEFORE THE BOTTOM ARGBASH MARKER  ^^^

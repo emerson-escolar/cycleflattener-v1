@@ -38,8 +38,8 @@ def construct_parser() -> argparse.ArgumentParser:
 
     cylinder_parser = subparsers.add_parser('cylinder', help='Generate cylinder', parents=[common_parser])
     cylinder_parser.add_argument("--num", type=int, help="number of points along surface", default=1000)
-    cylinder_parser.add_argument("--height", type=float, help="height", default=2.0)
-    cylinder_parser.add_argument("--radius", type=float, help="radius", default=1.0)
+    cylinder_parser.add_argument("--height_str", type=str, help="height", default="2.0")
+    cylinder_parser.add_argument("--radius_str", type=str, help="radius", default="1.0")
     cylinder_parser.add_argument("--based", action="store_true", help="add additional points along the base boundary. This doubles the number of points.")
 
     pdb_parser = subparsers.add_parser('pdb', help='Fetch pdb data', parents=[common_parser])
@@ -112,8 +112,10 @@ def generate_circle(outputdir:pathlib.Path,
 
 
 def generate_cylinder(outputdir:pathlib.Path,
-                      num, h, r, based,
+                      num, h_str, r_str, based,
                       show=False):
+    h = float(h_str)
+    r = float(r_str)
     rng = np.random.default_rng()
 
     data = np.zeros((num, 3))
@@ -187,7 +189,7 @@ def main():
                         epsilon_str=args.epsilon_str, r_str=args.radius_str,
                         show=args.show)
     elif args.type == "cylinder":
-        generate_cylinder(args.outputdir, num=args.num, h=args.height, r=args.radius, based=args.based,
+        generate_cylinder(args.outputdir, num=args.num, h_str=args.height_str, r_str=args.radius_str, based=args.based,
                           show=args.show)
 
     elif args.type == "pdb":
