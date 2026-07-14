@@ -1,6 +1,9 @@
 
 .PHONY: all
-all: experiment_circle.sh-parsing.sh experiment_cylinder.sh-parsing.sh experiment_slipper.sh-parsing.sh
+all: experiment_circle.sh-parsing.sh \
+     experiment_cylinder.sh-parsing.sh \
+     experiment_slipper.sh-parsing.sh \
+     experiment_repeated.sh-parsing.sh
 
 
 experiment_circle.sh-parsing.sh: experiment_circle.sh-parsing.m4
@@ -13,3 +16,7 @@ experiment_cylinder.sh-parsing.sh: experiment_cylinder.sh-parsing.m4
 
 experiment_slipper.sh-parsing.sh: experiment_slipper.sh-parsing.m4
 	argbash --strip user-content "experiment_slipper.sh-parsing.m4" -o "experiment_slipper.sh-parsing.sh"
+
+
+experiment_repeated.sh-parsing.sh: experiment_repeated.sh-parsing.m4
+	argbash --strip user-content "experiment_repeated.sh-parsing.m4" -o "experiment_repeated.sh-parsing.sh"
