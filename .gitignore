@@ -4,6 +4,7 @@ cplex_python_3.10
 replication/*
 !replication/experiment*
 !replication/Makefile
+!replication/repeated_parser.py
 
 # Python-generated files
 __pycache__/
