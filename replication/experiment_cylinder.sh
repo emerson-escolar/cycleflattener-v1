@@ -4,7 +4,8 @@
 # Run 'argbash --strip user-content "experiment_cylinder.sh-parsing.m4" -o "experiment_cylinder.sh-parsing.sh"' to generate the 'experiment_cylinder.sh-parsing.sh' file.
 # If you need to make changes later, edit 'experiment_cylinder.sh-parsing.sh' directly, and regenerate by running
 # 'argbash --strip user-content "experiment_cylinder.sh-parsing.sh" -o "experiment_cylinder.sh-parsing.sh"'
-script_dir="$(cd "$(dirname "$(readlink -e "${BASH_SOURCE[0]}")")" && pwd)"
+# script_dir="$(cd "$(dirname "$(readlink -e "${BASH_SOURCE[0]}")")" && pwd)"
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 . "${script_dir}/experiment_cylinder.sh-parsing.sh" || { echo "Couldn't find 'experiment_cylinder.sh-parsing.sh' parsing library in the '$script_dir' directory"; exit 1; }
 
 # vvv  PLACE YOUR CODE HERE  vvv

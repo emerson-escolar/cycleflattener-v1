@@ -1,10 +1,26 @@
 #!/usr/bin/env bash
 
-BS=30
-FS=30
-FR=20
-timeLimit=1
-nSolve=3
+# Created by argbash-init v2.11.0
+# Run 'argbash --strip user-content "experiment_slipper.sh-parsing.m4" -o "experiment_slipper.sh-parsing.sh"' to generate the 'experiment_slipper.sh-parsing.sh' file.
+# If you need to make changes later, edit 'experiment_slipper.sh-parsing.sh' directly, and regenerate by running
+# 'argbash --strip user-content "experiment_slipper.sh-parsing.sh" -o "experiment_slipper.sh-parsing.sh"'
+# script_dir="$(cd "$(dirname "$(readlink -e "${BASH_SOURCE[0]}")")" && pwd)"
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+. "${script_dir}/experiment_slipper.sh-parsing.sh" || { echo "Couldn't find 'experiment_slipper.sh-parsing.sh' parsing library in the '$script_dir' directory"; exit 1; }
+
+# vvv  PLACE YOUR CODE HERE  vvv
+# For example:
+printf 'Value of --%s: %s\n' 'timeLimit' "$_arg_timelimit"
+printf 'Value of --%s: %s\n' 'nSolve' "$_arg_nsolve"
+printf "Value of '%s': %s\\n" 'BS' "$_arg_bs"
+printf "Value of '%s': %s\\n" 'FS' "$_arg_fs"
+printf "Value of '%s': %s\\n" 'FR' "$_arg_fr"
+
+BS="$_arg_bs"
+FS="$_arg_fs"
+FR="$_arg_fr"
+timeLimit="$_arg_timelimit"
+nSolve="$_arg_nsolve"
 
 origDir=$(pwd)
 echo $origDir
@@ -57,3 +73,5 @@ do
 done
 
 cd $origDir
+
+# ^^^  TERMINATE YOUR CODE BEFORE THE BOTTOM ARGBASH MARKER  ^^^

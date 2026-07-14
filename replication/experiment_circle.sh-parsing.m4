@@ -7,7 +7,7 @@ exit 11  #)Created by argbash-init v2.11.0
 # ARG_OPTIONAL_SINGLE([nSolve],,[number of times to call solver],[1])
 # ARG_OPTIONAL_SINGLE([epsilon],,[noise epsilon for data],[0.2])
 # ARG_OPTIONAL_SINGLE([radius],,[radius of circle],[1])
-# ARG_POSITIONAL_SINGLE([NUM],,[number of points in data])
+# ARG_POSITIONAL_SINGLE([NUM],[number of points in data])
 # ARGBASH_SET_DELIM([ =])
 # ARG_OPTION_STACKING([getopt])
 # ARG_RESTRICT_VALUES([no-local-options])
