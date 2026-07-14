@@ -1,10 +1,27 @@
 #!/usr/bin/env bash
 
-NUM=200
-RADIUS=1.0
-EPSILON=0.2
-timeLimit=5
-nSolve=20
+# Created by argbash-init v2.11.0
+# Run 'argbash --strip user-content "experiment_circle.sh-parsing.m4" -o "experiment_circle.sh-parsing.sh"' to generate the 'experiment_circle.sh-parsing.sh' file.
+# If you need to make changes later, edit 'experiment_circle.sh-parsing.sh' directly, and regenerate by running
+# 'argbash --strip user-content "experiment_circle.sh-parsing.sh" -o "experiment_circle.sh-parsing.sh"'
+# script_dir="$(cd "$(dirname "$(readlink -e "${BASH_SOURCE[0]}")")" && pwd)"
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+. "${script_dir}/experiment_circle.sh-parsing.sh" || { echo "Couldn't find 'experiment_circle.sh-parsing.sh' parsing library in the '$script_dir' directory"; exit 1; }
+
+# vvv  PLACE YOUR CODE HERE  vvv
+# For example:
+printf 'Value of --%s: %s\n' 'timeLimit' "$_arg_timelimit"
+printf 'Value of --%s: %s\n' 'nSolve' "$_arg_nsolve"
+printf 'Value of --%s: %s\n' 'epsilon' "$_arg_epsilon"
+printf 'Value of --%s: %s\n' 'radius' "$_arg_radius"
+printf "Value of '%s': %s\\n" 'NUM' "$_arg_num"
+
+
+NUM="$_arg_num"
+RADIUS="$_arg_radius"
+EPSILON="$_arg_epsilon"
+timeLimit="$_arg_timelimit"
+nSolve="$_arg_nsolve"
 
 origDir=$(pwd)
 echo $origDir
@@ -25,6 +42,7 @@ echo $FOLDER
 if [ ! -f "$replDir/$FOLDER/$DATA.txt" ]; then
     echo "$replDir/$FOLDER/$DATA.txt not found; generating data..."
     uv run ./tests/generate_testdata.py circle --num $NUM --radius $RADIUS --epsilon $EPSILON -o $replDir/$FOLDER
+    echo "$replDir/$FOLDER/$DATA.txt generated."
 else
     echo "$replDir/$FOLDER/$DATA.txt found."
 fi
@@ -32,6 +50,7 @@ fi
 if [ ! -f "$replDir/$FOLDER/gen_${DATA}_alphamap.txt" ]; then
     echo "$replDir/$FOLDER/gen_${DATA}_alphamap.txt not found; applying optiperslp..."
     optiperslp -e -z -p $replDir/$FOLDER $replDir/$FOLDER/$DATA.txt
+    echo "$replDir/$FOLDER/$DATA.txt processed by optiperslp"
 else
     echo "$replDir/$FOLDER/gen_$DATA_alphamap.txt found."
 fi
@@ -55,3 +74,6 @@ do
 done
 
 cd $origDir
+
+
+# ^^^  TERMINATE YOUR CODE BEFORE THE BOTTOM ARGBASH MARKER  ^^^

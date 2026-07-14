@@ -33,8 +33,8 @@ def construct_parser() -> argparse.ArgumentParser:
 
     circle_parser = subparsers.add_parser('circle', help='Generate noisy circle', parents=[common_parser])
     circle_parser.add_argument("--num", type=int, help="half of total number of points", default=1000)
-    circle_parser.add_argument("--epsilon", type=float, help="noise epsilon", default=0.2)
-    circle_parser.add_argument("--radius", type=float, help="radius", default=1.0)
+    circle_parser.add_argument("--epsilon_str", type=str, help="noise epsilon", default="0.2")
+    circle_parser.add_argument("--radius_str", type=str, help="radius", default="1.0")
 
     cylinder_parser = subparsers.add_parser('cylinder', help='Generate cylinder', parents=[common_parser])
     cylinder_parser.add_argument("--num", type=int, help="number of points along surface", default=1000)
@@ -79,8 +79,10 @@ def generate_slipper(outputdir:pathlib.Path,
 
 
 def generate_circle(outputdir:pathlib.Path,
-                    num, epsilon, r=1,
+                    num, epsilon_str:str, r_str:str,
                     show=False):
+    r = float(r_str)
+    epsilon = float(epsilon_str)
 
     base = np.zeros((num, 3))
     theta_list = np.linspace(0, 2 * np.pi, num)
@@ -103,7 +105,7 @@ def generate_circle(outputdir:pathlib.Path,
         plt.show()
 
     outputdir.mkdir(parents=True, exist_ok=True)
-    fname = f"noisy_circle_{r}_{num}_{epsilon}.txt"
+    fname = f"noisy_circle_{r_str}_{num}_{epsilon_str}.txt"
     cue.save_data_with_constant_radii(data, 0, outputdir / fname)
 
 
@@ -181,7 +183,8 @@ def main():
                          front_sole_n=args.fs, front_rise_n=args.fr,
                          show=args.show)
     elif args.type == "circle":
-        generate_circle(args.outputdir, num=args.num, epsilon=args.epsilon, r=args.radius,
+        generate_circle(args.outputdir, num=args.num,
+                        epsilon_str=args.epsilon_str, r_str=args.radius_str,
                         show=args.show)
     elif args.type == "cylinder":
         generate_cylinder(args.outputdir, num=args.num, h=args.height, r=args.radius, based=args.based,

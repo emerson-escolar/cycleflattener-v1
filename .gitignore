@@ -3,6 +3,7 @@ cplex_python_3.10
 
 replication/*
 !replication/experiment*
+!replication/Makefile
 
 # Python-generated files
 __pycache__/
