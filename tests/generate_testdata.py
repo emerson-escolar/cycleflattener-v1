@@ -41,6 +41,11 @@ def construct_parser() -> argparse.ArgumentParser:
     torus_parser.add_argument("--radius_str", type=str, help="Major radius", default="2.0")
     torus_parser.add_argument("--tube_radius_str", type=str, help="Tube radius", default="0.5")
 
+    double_torus_parser = subparsers.add_parser('doubletorus', help='Generate sample from solid double torus', parents=[common_parser])
+    double_torus_parser.add_argument("--num", type=int, help="half of total number of points", default=1000)
+    double_torus_parser.add_argument("--radius_str", type=str, help="Major radius", default="2.0")
+    double_torus_parser.add_argument("--tube_radius_str", type=str, help="Tube radius", default="0.5")
+
     cylinder_parser = subparsers.add_parser('cylinder', help='Generate cylinder', parents=[common_parser])
     cylinder_parser.add_argument("--num", type=int, help="number of points along surface", default=1000)
     cylinder_parser.add_argument("--height_str", type=str, help="height", default="2.0")
@@ -84,13 +89,14 @@ def generate_slipper(outputdir:pathlib.Path,
 
 
 def generate_torus(outputdir:pathlib.Path|None,
-                   num, R_str:str, r_str:str):
-    r = float(r_str)
+                   num, R_str:str, r_str:str,
+                   theta_low=-np.pi, theta_high=np.pi):
     R = float(R_str)
 
     rng = np.random.default_rng()
+    r = rng.uniform(0, float(r_str), num)
     phi = rng.uniform(0, 2*np.pi, num)
-    theta = np.random.uniform(0, 2*np.pi, num)
+    theta = np.random.uniform(theta_low, theta_high, num)
 
     data = np.zeros((num, 3))
 
@@ -101,6 +107,32 @@ def generate_torus(outputdir:pathlib.Path|None,
     if outputdir is not None:
         outputdir.mkdir(parents=True, exist_ok=True)
         fname = f"solid_torus_{R_str}_{r_str}_{num}.txt"
+        cue.save_data_with_constant_radii(data, 0, outputdir / fname)
+
+    return data
+
+def generate_double_torus(outputdir:pathlib.Path|None,
+                          num, R_str:str, r_str:str):
+    # essentially put two torii side by side (with overlap.
+    # but, we make the shared region sparser.
+
+    r = float(r_str)
+    R = float(R_str)
+
+    gap = np.arccos(R/(R+r))
+
+    shift_right = np.array([[R, 0, 0]])
+    shift_left = np.array([[-R, 0, 0]])
+
+    data = np.concat((shift_left + generate_torus(None, num//8, R_str, r_str),
+                      shift_left + generate_torus(None, num*3//8, R_str, r_str, theta_low=gap, theta_high=2*np.pi-gap),
+                      shift_right + generate_torus(None, num//8, R_str, r_str),
+                      shift_right + generate_torus(None, num*3//8, R_str, r_str, theta_low=gap-np.pi, theta_high=np.pi-gap)))
+
+
+    if outputdir is not None:
+        outputdir.mkdir(parents=True, exist_ok=True)
+        fname = f"solid_doubletorus_{R_str}_{r_str}_{num}.txt"
         cue.save_data_with_constant_radii(data, 0, outputdir / fname)
 
 
@@ -219,6 +251,9 @@ def main():
                           show=args.show)
     elif args.type == "torus":
         generate_torus(args.outputdir, num=args.num, R_str=args.radius_str, r_str=args.tube_radius_str)
+
+    elif args.type == "doubletorus":
+        generate_double_torus(args.outputdir, num=args.num, R_str=args.radius_str, r_str=args.tube_radius_str)
 
     elif args.type == "pdb":
         generate_pdb_data(args.outputdir, pdb_code=args.pdb, local_pdb_dir=args.pdbdir,

@@ -8,7 +8,7 @@ run_experiments() {
 
     if [ ! -f "${DATADIR}/gen_${DATA}_alphamap.txt" ]; then
 	echo "${DATADIR}/gen_${DATA}_alphamap.txt not found; applying optiperslp..."
-	optiperslp -e -z -p "$DATADIR" "${DATADIR}/${DATA}.txt"
+	optiperslp -e -z -p "$DATADIR" "${DATADIR}/${DATA}.txt" || exit 1
 	echo "${DATADIR}/${DATA}.txt processed by optiperslp"
     else
 	echo "${DATADIR}/gen_${DATA}_alphamap.txt found."
