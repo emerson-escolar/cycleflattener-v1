@@ -1,18 +1,16 @@
 #!/usr/bin/env bash
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-. "${script_dir}/experiment_circle.sh-parsing.sh" || { echo "Couldn't find 'experiment_circle.sh-parsing.sh' parsing library in the '$script_dir' directory"; exit 1; }
+. "${script_dir}/experiment_torus.sh-parsing.sh" || { echo "Couldn't find 'experiment_torus.sh-parsing.sh' parsing library in the '$script_dir' directory"; exit 1; }
 
 # vvv  PLACE YOUR CODE HERE  vvv
 printf 'Value of --%s: %s\n' 'timeLimit' "$_arg_timelimit"
 printf 'Value of --%s: %s\n' 'nSolve' "$_arg_nsolve"
-printf 'Value of --%s: %s\n' 'epsilon' "$_arg_epsilon"
 printf 'Value of --%s: %s\n' 'radius' "$_arg_radius"
+printf 'Value of --%s: %s\n' 'tuberadius' "$_arg_tuberadius"
 printf "Value of '%s': %s\\n" 'NUM' "$_arg_num"
 
 NUM="$_arg_num"
-RADIUS="$_arg_radius"
-EPSILON="$_arg_epsilon"
 
 
 # Setting directories.
@@ -27,17 +25,17 @@ projectDir="${replDir}/../"
 cd $projectDir
 #
 
-DATA=noisy_circle_${RADIUS}_${NUM}_${EPSILON}
+DATA="solid_torus_${_arg_radius}_${_arg_tuberadius}_${NUM}"
 
 
 # data generation
-UUID=$(uv run -p 3.14 --no-project -m uuid -u uuid7)
-FOLDER=${DATA}_${UUID}
+UUID="$(uv run -p 3.14 --no-project -m uuid -u uuid7)"
+FOLDER="${DATA}_${UUID}"
 DATADIR="${replDir}/${FOLDER}"
 
 if [ ! -f "${DATADIR}/${DATA}.txt" ]; then
     echo "${DATADIR}/${DATA}.txt not found; generating data..."
-    uv run ./tests/generate_testdata.py circle --num "$NUM" --radius "$RADIUS" --epsilon "$EPSILON" -o "${DATADIR}"
+    uv run ./tests/generate_testdata.py torus --num "${NUM}" --radius_str "${_arg_radius}" --tube_radius_str "${_arg_tuberadius}" -o "${DATADIR}"
     echo "${DATADIR}/${DATA}.txt generated."
 else
     echo "${DATADIR}/${DATA}.txt found."

@@ -36,6 +36,11 @@ def construct_parser() -> argparse.ArgumentParser:
     circle_parser.add_argument("--epsilon_str", type=str, help="noise epsilon", default="0.2")
     circle_parser.add_argument("--radius_str", type=str, help="radius", default="1.0")
 
+    torus_parser = subparsers.add_parser('torus', help='Generate sample from solid torus', parents=[common_parser])
+    torus_parser.add_argument("--num", type=int, help="half of total number of points", default=1000)
+    torus_parser.add_argument("--radius_str", type=str, help="Major radius", default="2.0")
+    torus_parser.add_argument("--tube_radius_str", type=str, help="Tube radius", default="0.5")
+
     cylinder_parser = subparsers.add_parser('cylinder', help='Generate cylinder', parents=[common_parser])
     cylinder_parser.add_argument("--num", type=int, help="number of points along surface", default=1000)
     cylinder_parser.add_argument("--height_str", type=str, help="height", default="2.0")
@@ -76,6 +81,27 @@ def generate_slipper(outputdir:pathlib.Path,
     name = f"slipper_{r_x}_{r_y}_{r_z}_{back_sole_n}_{front_sole_n}_{front_rise_n}"
     fname = f"{name}.txt"
     cue.save_data_with_constant_radii(data, 0, outputdir / fname)
+
+
+def generate_torus(outputdir:pathlib.Path|None,
+                   num, R_str:str, r_str:str):
+    r = float(r_str)
+    R = float(R_str)
+
+    rng = np.random.default_rng()
+    phi = rng.uniform(0, 2*np.pi, num)
+    theta = np.random.uniform(0, 2*np.pi, num)
+
+    data = np.zeros((num, 3))
+
+    data[:,0] = (R + r * np.cos(phi)) * np.cos(theta)
+    data[:,1] = (R + r * np.cos(phi)) * np.sin(theta)
+    data[:,2] = r * np.sin(phi)
+
+    if outputdir is not None:
+        outputdir.mkdir(parents=True, exist_ok=True)
+        fname = f"solid_torus_{R_str}_{r_str}_{num}.txt"
+        cue.save_data_with_constant_radii(data, 0, outputdir / fname)
 
 
 def generate_circle(outputdir:pathlib.Path,
@@ -191,6 +217,8 @@ def main():
     elif args.type == "cylinder":
         generate_cylinder(args.outputdir, num=args.num, h_str=args.height_str, r_str=args.radius_str, based=args.based,
                           show=args.show)
+    elif args.type == "torus":
+        generate_torus(args.outputdir, num=args.num, R_str=args.radius_str, r_str=args.tube_radius_str)
 
     elif args.type == "pdb":
         generate_pdb_data(args.outputdir, pdb_code=args.pdb, local_pdb_dir=args.pdbdir,

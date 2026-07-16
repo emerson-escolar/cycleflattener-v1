@@ -33,7 +33,7 @@ def construct_parser() -> argparse.ArgumentParser:
     parser.add_argument("cyclesfile", type=pathlib.Path,
                         help="name of solution cycles file")
     parser.add_argument("--version", "-r", type=int,
-                        help="cycle files veRsion", default=1)
+                        help="cycle files veRsion", default=2)
     return parser
 
 
