@@ -15,21 +15,19 @@ def construct_parser() -> argparse.ArgumentParser:
     Program for viewing angle optimization results.
 
     Assumes that the files
-      gen_{args.inputname}_i2p.txt
-      gen_{args.inputname}_alphamap.txt
-      gen_{args.inputname}_boundary.txt
-      gen_{args.inputname}_1.txt
-    are in {args.inputdir} and reads them.
+      gen_{dataname}_i2p.txt
+      gen_{dataname}_alphamap.txt
+      gen_{dataname}_boundary.txt
+      gen_{dataname}_1.txt
+    are in the same folder as {args.input} and reads them,
+    where dataname is the basename of {args.input} with the suffix .txt removed.
     ''')
 
     parser = argparse.ArgumentParser(description=desc,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
 
-    parser.add_argument("inputname", type=str,
-                        help="name in string of data")
-    parser.add_argument("--inputdir", "-i", type=pathlib.Path,
-                        help="path to directory where original point cloud and cycles are stored",
-                        default=pathlib.Path.cwd())
+    parser.add_argument("input", type=pathlib.Path,
+                        help="path to .txt file containing original point cloud")
     parser.add_argument("cyclesfile", type=pathlib.Path,
                         help="name of solution cycles file")
     parser.add_argument("--version", "-r", type=int,
@@ -43,10 +41,16 @@ def main():
 
     filt = cycleflattener.filtration.Filtration()
 
-    filt.load_vertices(args.inputdir / f"gen_{args.inputname}_i2p.txt")
-    filt.load_alpha_simplices(args.inputdir / f"gen_{args.inputname}_alphamap.txt")
-    filt.load_boundaries(args.inputdir / f"gen_{args.inputname}_boundary.txt")
-    filt.load_1_cycles(args.inputdir / f"gen_{args.inputname}_1.txt")
+    inp:pathlib.Path = args.input
+
+    assert(inp.is_file())
+    dataname = inp.stem
+    inputdir = inp.parent
+
+    filt.load_vertices(inputdir / f"gen_{dataname}_i2p.txt")
+    filt.load_alpha_simplices(inputdir / f"gen_{dataname}_alphamap.txt")
+    filt.load_boundaries(inputdir / f"gen_{dataname}_boundary.txt")
+    filt.load_1_cycles(inputdir / f"gen_{dataname}_1.txt")
 
     if args.version == 1:
         with open(args.cyclesfile) as fp:
