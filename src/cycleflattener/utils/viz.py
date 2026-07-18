@@ -3,6 +3,29 @@ import plotly.express as px
 import plotly.graph_objects as go
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
+
+
+def plot_data_and_cycle(filt, cycle, color, ofname,
+                        set_aspect=False, show=False):
+    #  cycle is a dictionary {simplexindex:coeff} representing a cycle.
+    data = filt.vertex_coordinates
+
+    fig = plt.figure(figsize=(8, 8))
+    ax = fig.add_subplot(111, projection="3d")
+    ax.scatter(data[:, 0], data[:, 1], data[:, 2], s=1, c="blue")
+    for simp_cycle in filt.get_1_cycle_vertices(cycle):
+        idxs = simp_cycle + [simp_cycle[0]]
+        ax.plot(data[idxs, 0], data[idxs, 1], data[idxs, 2], c=color)
+    if set_aspect:
+        ax.set_box_aspect((np.ptp(data[:,0]), np.ptp(data[:,1]), np.ptp(data[:,2])))
+
+    plt.savefig(ofname)
+    if show:
+        plt.show(block=True)
+
+
+
 
 def plotly_data_and_cycle(filt, cycles_with_annot, max_filtration_value):
     # cycles_with_annot is a pair (cycles, annots) of:

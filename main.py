@@ -1,5 +1,5 @@
-import cycleflattener
-import cycleflattener.utils.viewer
+import cycleflattener.filtration
+import cycleflattener.utils.viz as viz
 import cycleflattener.utils.saveload as sl
 
 import numpy as np
@@ -54,23 +54,6 @@ def construct_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def plot_data_and_cycle(filt, cycle, color,
-                        ofname:pathlib.Path, show=False):
-    #  cycle is a dictionary {simplexindex:coeff} representing a cycle.
-    data = filt.vertex_coordinates
-
-    fig = plt.figure(figsize=(8, 8))
-    ax = fig.add_subplot(111, projection="3d")
-    ax.scatter(data[:, 0], data[:, 1], data[:, 2], s=1, c="blue")
-    for simp_cycle in filt.get_1_cycle_vertices(cycle):
-        idxs = simp_cycle + [simp_cycle[0]]
-        ax.plot(data[idxs, 0], data[idxs, 1], data[idxs, 2], c=color)
-
-    plt.savefig(ofname)
-    if show:
-        plt.show(block=True)
-
-
 def main():
     args = construct_parser().parse_args()
 
@@ -102,7 +85,7 @@ def main():
     print("******************************")
     print("optimization target:")
     filt.print_1_cycle(cycle)
-    plot_data_and_cycle(filt, cycle, "red",
+    viz.plot_data_and_cycle(filt, cycle, "red",
                         args.outputdir / f"{args.inputname}_cyclebefore.pdf")
     plt.close()
     print("******************************")
@@ -132,8 +115,7 @@ def main():
 
     # report results
     for i, soln_cycle in enumerate(soln_cycles):
-        plot_data_and_cycle(filt, soln_cycle, "green",
-                            args.outputdir / f"{args.inputname}_cycleafter_{i+1}.pdf")
+        viz.plot_data_and_cycle(filt, soln_cycle, "green", args.outputdir / f"{args.inputname}_cycleafter_{i+1}.pdf")
 
         print(f"z_{i+1}: computed kappa: {soln_values[i]} and {filt.get_1_cycle_total_absolute_curvature(soln_cycle)}")
 

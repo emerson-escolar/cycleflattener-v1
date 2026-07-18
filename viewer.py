@@ -1,5 +1,5 @@
-import cycleflattener
-import cycleflattener.utils.viewer
+import cycleflattener.filtration
+import cycleflattener.utils.viz
 import cycleflattener.utils.saveload as sl
 
 import json
@@ -79,7 +79,7 @@ def main():
             cycles = [x.cycle for x in cycles_p]
 
 
-    cycleflattener.utils.viewer.plotly_data_and_cycle(filt, (cycles, annots), d)
+    cycleflattener.utils.viz.plotly_data_and_cycle(filt, (cycles, annots), d)
 
 
 if __name__ == "__main__":
