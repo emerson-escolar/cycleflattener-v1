@@ -178,6 +178,5 @@ class TestFiltrationLoaders:
         print("optimization target:")
         filt.print_1_cycle(cycle)
 
-        filt.context_compute_angleoptimal_homologous_cycle(cycle=cycle, export_file="foobar.lp")
-
-        filt.context_compute_angleoptimal_homologous_cycle(cycle, qcr_shift=True)
+        print(filt.context_solve_aohcp(cycle=cycle))
+        print(filt.context_solve_aohcp(cycle, qcr_shift=True))

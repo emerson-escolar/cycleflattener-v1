@@ -348,30 +348,28 @@ class Filtration:
         return cycle
 
 
-    def context_compute_angleoptimal_homologous_cycle(self, cycle,
-                                                      maxbirth=np.inf, nbhd:list=None,
-                                                      qcr_shift:bool=False,
-                                                      export_file=None,
-                                                      cplex_config_file=None,
-                                                      timelimit=None):
+    def context_solve_aohcp(self, cycle, maxbirth=np.inf, nbhd:list=None,
+                            qcr_shift:bool=False,
+                            export_file=None,
+                            cplex_config_file=None, timelimit=None):
 
-        return self.context_compute_angleoptimal_homologous_cycle_repeated(cycle,
-                                                                           maxbirth=maxbirth,
-                                                                           nbhd=nbhd,
-                                                                           qcr_shift=qcr_shift,
-                                                                           export_file=export_file,
-                                                                           cplex_config_file=cplex_config_file,
-                                                                           timelimit=timelimit,
-                                                                           n_epoch=1)[0]
+        ans = self.context_solve_aohcp_repeated(cycle, maxbirth=maxbirth, nbhd=nbhd,
+                                                qcr_shift=qcr_shift,
+                                                export_file=export_file,
+                                                cplex_config_file=cplex_config_file, timelimit=timelimit,
+                                                n_epoch=1)
+
+        return list(ans)[0]
 
 
-    def context_compute_angleoptimal_homologous_cycle_repeated(self, cycle,
-                                                               maxbirth=np.inf, nbhd:list=None,
-                                                               qcr_shift:bool=False,
-                                                               export_file=None,
-                                                               cplex_config_file=None,
-                                                               timelimit=None,
-                                                               n_epoch=1):
+
+    def context_solve_aohcp_repeated(self, cycle,
+                                     maxbirth=np.inf, nbhd:list=None,
+                                     qcr_shift:bool=False,
+                                     export_file=None,
+                                     cplex_config_file=None,
+                                     timelimit=None,
+                                     n_epoch=1):
         # assumptions:
         #  cycle is a dictionary {simplexindex:coeff} representing a cycle.
 
@@ -415,8 +413,6 @@ class Filtration:
             angleoptimizer.mdl.export_as_lp(basename="quadratic_optimize",
                                             path=str(export_file))
 
-        solution_cycles = []
-        solution_values = []
         for i in range(n_epoch):
             solution, x_vec, y_vec = angleoptimizer.solve(log_output=True)
             cycle = self.context_vector_to_1_cycle(x_vec, maxbirth=maxbirth, nbhd=nbhd)
@@ -430,7 +426,4 @@ class Filtration:
             self.print_1_cycle(cycle)
             print("******************************")
 
-            solution_cycles.append(cycle)
-            solution_values.append(solution.objective_value)
-
-        return solution_cycles, solution_values
+            yield (cycle, solution.objective_value)
