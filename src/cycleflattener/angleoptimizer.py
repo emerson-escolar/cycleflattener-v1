@@ -50,13 +50,13 @@ class AngleOptimizer:
         for i in range(self.z.shape[0]):
             coeff = self.z[i,0]
             if coeff >= 0:
-                warm_start.add_var_value(self.x_variables[i], coeff)
+                warm_start.add_var_value(self.x_variables[i], float(coeff))
             else:
-                warm_start.add_var_value(self.x_variables[i+self.z.shape[0]], -coeff)
-        self.mdl.add_mip_start(warm_start)
+                warm_start.add_var_value(self.x_variables[i+self.z.shape[0]], -float(coeff))
+
         print(f"Warm start is valid: {warm_start.is_valid_solution()}")
-        # warm_start_obj = self.mdl.objective_expr.evaluate(warm_start)
-        # print(f"Warm start initial objective value: {warm_start_obj}.")
+        if warm_start.is_valid_solution():
+            self.mdl.add_mip_start(warm_start)
 
 
     @property
@@ -105,4 +105,4 @@ class AngleOptimizer:
             x_vec = self.__solution_to_csr(solution, "x")
             y_vec = self.__solution_to_csr(solution, "y")
 
-        return (solution, x_vec, y_vec)
+        return solution, x_vec, y_vec

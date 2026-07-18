@@ -70,6 +70,7 @@ def plot_data_and_cycle(filt, cycle, color,
     if show:
         plt.show(block=True)
 
+
 def main():
     args = construct_parser().parse_args()
 
@@ -125,7 +126,9 @@ def main():
                             cycle=cycle), ]
 
     # optimize
-    soln_cycles, soln_values = filt.context_compute_angleoptimal_homologous_cycle_repeated(filt.cycles[idx], maxbirth=relbirth, qcr_shift=args.shift, export_file=args.outputdir / f"{args.inputname}.lp", cplex_config_file=cf, timelimit=args.timelimit, n_epoch=args.nsolves)
+    soln_cycles, soln_values = filt.context_compute_angleoptimal_homologous_cycle_repeated(cycle, maxbirth=relbirth, qcr_shift=args.shift,
+                                                                                           export_file=args.outputdir / f"{args.inputname}.lp",
+                                                                                           cplex_config_file=cf, timelimit=args.timelimit, n_epoch=args.nsolves)
 
     # report results
     for i, soln_cycle in enumerate(soln_cycles):

@@ -348,14 +348,14 @@ class Filtration:
         return cycle
 
 
-    def context_compute_angleoptimal_homologous_cycle(self, cycle_bd,
+    def context_compute_angleoptimal_homologous_cycle(self, cycle,
                                                       maxbirth=np.inf, nbhd:list=None,
                                                       qcr_shift:bool=False,
                                                       export_file=None,
                                                       cplex_config_file=None,
                                                       timelimit=None):
 
-        return self.context_compute_angleoptimal_homologous_cycle_repeated(cycle_bd,
+        return self.context_compute_angleoptimal_homologous_cycle_repeated(cycle,
                                                                            maxbirth=maxbirth,
                                                                            nbhd=nbhd,
                                                                            qcr_shift=qcr_shift,
@@ -365,7 +365,7 @@ class Filtration:
                                                                            n_epoch=1)[0]
 
 
-    def context_compute_angleoptimal_homologous_cycle_repeated(self, cycle_bd,
+    def context_compute_angleoptimal_homologous_cycle_repeated(self, cycle,
                                                                maxbirth=np.inf, nbhd:list=None,
                                                                qcr_shift:bool=False,
                                                                export_file=None,
@@ -373,13 +373,7 @@ class Filtration:
                                                                timelimit=None,
                                                                n_epoch=1):
         # assumptions:
-        # cycle_bd is a pair of a cycle and a bd_pair
         #  cycle is a dictionary {simplexindex:coeff} representing a cycle.
-        #  bd_pair is a pair (birth, death)
-
-        cycle = cycle_bd[0]
-        cycle_birth = cycle_bd[1][0]
-        cycle_death = cycle_bd[1][1]
 
         # get incident vertices:
         vertex_vindices = []
@@ -420,8 +414,6 @@ class Filtration:
         if export_file is not None:
             angleoptimizer.mdl.export_as_lp(basename="quadratic_optimize",
                                             path=str(export_file))
-        # print("EDITED")
-        # angleoptimizer.mdl.set_time_limit(600)
 
         solution_cycles = []
         solution_values = []
