@@ -12,6 +12,8 @@ import numpy as np
 
 import Bio.PDB as pdb
 
+
+
 def construct_parser() -> argparse.ArgumentParser:
     desc = textwrap.dedent('''\
     Program for generating test data.
@@ -58,148 +60,7 @@ def construct_parser() -> argparse.ArgumentParser:
                             help="path to directory where to save pdb files",
                             default=pathlib.Path(__file__).resolve().parent)
 
-
-
     return parser
-
-
-def generate_slipper(outputdir:pathlib.Path,
-                     r_x = 2, r_y = 1, r_z = 1,
-                     back_sole_n = 40,
-                     front_sole_n = 40,
-                     front_rise_n = 15,
-                     show=False):
-    data = cue.generate_soleless_slipper(r_x, r_y, r_z,
-                                         back_sole_n,
-                                         front_sole_n,
-                                         front_rise_n)
-
-    if show:
-        fig = plt.figure(figsize=(8, 8))
-        ax = fig.add_subplot(111, projection="3d")
-        ax.scatter(data[:, 0], data[:, 1], data[:, 2], s=1, c="blue")
-        ax.set_zlim(-1, 1)
-        plt.show()
-
-    outputdir.mkdir(parents=True, exist_ok=True)
-
-    name = f"slipper_{r_x}_{r_y}_{r_z}_{back_sole_n}_{front_sole_n}_{front_rise_n}"
-    fname = f"{name}.txt"
-    cue.save_data_with_constant_radii(data, 0, outputdir / fname)
-
-
-def generate_torus(outputdir:pathlib.Path|None,
-                   num, R_str:str, r_str:str,
-                   theta_low=-np.pi, theta_high=np.pi):
-    R = float(R_str)
-
-    rng = np.random.default_rng()
-    r = rng.uniform(0, float(r_str), num)
-    phi = rng.uniform(0, 2*np.pi, num)
-    theta = np.random.uniform(theta_low, theta_high, num)
-
-    data = np.zeros((num, 3))
-
-    data[:,0] = (R + r * np.cos(phi)) * np.cos(theta)
-    data[:,1] = (R + r * np.cos(phi)) * np.sin(theta)
-    data[:,2] = r * np.sin(phi)
-
-    if outputdir is not None:
-        outputdir.mkdir(parents=True, exist_ok=True)
-        fname = f"solid_torus_{R_str}_{r_str}_{num}.txt"
-        cue.save_data_with_constant_radii(data, 0, outputdir / fname)
-
-    return data
-
-def generate_double_torus(outputdir:pathlib.Path|None,
-                          num, R_str:str, r_str:str):
-    # essentially put two torii side by side (with overlap.
-    # but, we make the shared region sparser.
-
-    r = float(r_str)
-    R = float(R_str)
-
-    gap = np.arccos(R/(R+r))
-
-    shift_right = np.array([[R, 0, 0]])
-    shift_left = np.array([[-R, 0, 0]])
-
-    data = np.concat((shift_left + generate_torus(None, num//8, R_str, r_str),
-                      shift_left + generate_torus(None, num*3//8, R_str, r_str, theta_low=gap, theta_high=2*np.pi-gap),
-                      shift_right + generate_torus(None, num//8, R_str, r_str),
-                      shift_right + generate_torus(None, num*3//8, R_str, r_str, theta_low=gap-np.pi, theta_high=np.pi-gap)))
-
-
-    if outputdir is not None:
-        outputdir.mkdir(parents=True, exist_ok=True)
-        fname = f"solid_doubletorus_{R_str}_{r_str}_{num}.txt"
-        cue.save_data_with_constant_radii(data, 0, outputdir / fname)
-
-
-def generate_circle(outputdir:pathlib.Path,
-                    num, epsilon_str:str, r_str:str,
-                    show=False):
-    r = float(r_str)
-    epsilon = float(epsilon_str)
-
-    base = np.zeros((num, 3))
-    theta_list = np.linspace(0, 2 * np.pi, num)
-    base[:,0] += r * np.cos(theta_list)
-    base[:,1] += r * np.sin(theta_list)
-
-    data = np.copy(base)
-    rng = np.random.default_rng()
-    data += rng.uniform(-epsilon, epsilon, (num, 3))
-
-    base[:,0:2] += rng.uniform(-epsilon, epsilon, (num, 2))
-
-    data = np.concatenate((data, base))
-
-    if show:
-        fig = plt.figure(figsize=(8, 8))
-        ax = fig.add_subplot(111, projection="3d")
-        ax.scatter(data[:, 0], data[:, 1], data[:, 2], s=1, c="blue")
-        ax.set_zlim(-1, 1)
-        plt.show()
-
-    outputdir.mkdir(parents=True, exist_ok=True)
-    fname = f"noisy_circle_{r_str}_{num}_{epsilon_str}.txt"
-    cue.save_data_with_constant_radii(data, 0, outputdir / fname)
-
-
-
-
-def generate_cylinder(outputdir:pathlib.Path,
-                      num, h_str, r_str, based,
-                      show=False):
-    h = float(h_str)
-    r = float(r_str)
-    rng = np.random.default_rng()
-
-    data = np.zeros((num, 3))
-    theta = rng.uniform(-np.pi, np.pi, num)
-
-    data[:, 0] = r * np.cos(theta)
-    data[:, 1] = r * np.sin(theta)
-    data[:, 2] = rng.uniform(0, h, num)
-
-    if based:
-        base = np.zeros((num, 3))
-        theta = rng.uniform(-np.pi, np.pi, num)
-        base[:, 0] = r * np.cos(theta)
-        base[:, 1] = r * np.sin(theta)
-        data = np.concatenate((data, base))
-
-    if show:
-        fig = plt.figure(figsize=(8, 8))
-        ax = fig.add_subplot(111, projection="3d")
-        ax.scatter(data[:, 0], data[:, 1], data[:, 2], s=1, c="blue")
-        ax.set_zlim(-1, 1)
-        plt.show()
-
-    outputdir.mkdir(parents=True, exist_ok=True)
-    fname = f"cylinder_{h}_{r}_{num}.txt"
-    cue.save_data_with_constant_radii(data, 0, outputdir / fname)
 
 
 
@@ -222,45 +83,73 @@ def generate_pdb_data(outputdir:pathlib.Path,
                     all_atoms.append(atom.coord)
     data = np.array(all_atoms)
 
-    if show:
-        fig = plt.figure(figsize=(8, 8))
-        ax = fig.add_subplot(111, projection="3d")
-        ax.scatter(data[:, 0], data[:, 1], data[:, 2], s=1, c="blue")
-        plt.show()
+    return data
 
-    outputdir.mkdir(parents=True, exist_ok=True)
-    fname = f"pdb_{pdb_code}.txt"
-
-    cue.save_data_with_constant_radii(data, 0, outputdir / fname)
 
 
 def main():
     parser = construct_parser()
     args = parser.parse_args()
 
+    if args.type is None:
+        parser.print_help()
+        sys.exit(1)
+
+    args.outputdir.mkdir(parents=True, exist_ok=True)
+
     if args.type == "slipper":
-        generate_slipper(args.outputdir, back_sole_n=args.bs,
-                         front_sole_n=args.fs, front_rise_n=args.fr,
-                         show=args.show)
+        r_x = 2
+        r_y = 1
+        r_z = 1
+        back_sole_n = args.bs
+        front_sole_n = args.fs
+        front_rise_n = args.fr
+
+        data = cue.generate_soleless_slipper(r_x, r_y, r_z, back_sole_n, front_sole_n, front_rise_n)
+        dataname = f"slipper_{r_x}_{r_y}_{r_z}_{back_sole_n}_{front_sole_n}_{front_rise_n}"
+
     elif args.type == "circle":
-        generate_circle(args.outputdir, num=args.num,
-                        epsilon_str=args.epsilon_str, r_str=args.radius_str,
-                        show=args.show)
+        epsilon_str = args.epsilon_str
+        r_str = args.radius_str
+        data = cue.generate_noisy_circle(args.num, epsilon=float(epsilon_str), r=float(r_str), based=True)
+        dataname = f"noisy_circle_{r_str}_{args.num}_{epsilon_str}"
+
     elif args.type == "cylinder":
-        generate_cylinder(args.outputdir, num=args.num, h_str=args.height_str, r_str=args.radius_str, based=args.based,
-                          show=args.show)
+        h_str = args.height_str
+        r_str = args.radius_str
+        data = cue.generate_cylinder(args.num, h=float(h_str), r=float(r_str), based=args.based)
+        dataname = f"cylinder_{'based_' if args.based else ''}{h_str}_{r_str}_{args.num}"
+
     elif args.type == "torus":
-        generate_torus(args.outputdir, num=args.num, R_str=args.radius_str, r_str=args.tube_radius_str)
+        R_str = args.radius_str
+        r_str = args.tube_radius_str
+        data = cue.generate_torus(args.num, R=float(R_str), r=float(r_str))
+        dataname = f"solid_torus_{R_str}_{r_str}_{args.num}"
 
     elif args.type == "doubletorus":
-        generate_double_torus(args.outputdir, num=args.num, R_str=args.radius_str, r_str=args.tube_radius_str)
+        R_str = args.radius_str
+        r_str = args.tube_radius_str
+        data = cue.generate_double_torus(args.num, R=float(R_str), r=float(r_str))
+        dataname = f"solid_doubletorus_{R_str}_{r_str}_{args.num}"
 
     elif args.type == "pdb":
-        generate_pdb_data(args.outputdir, pdb_code=args.pdb, local_pdb_dir=args.pdbdir,
-                          show=args.show)
+        data = generate_pdb_data(args.outputdir, pdb_code=args.pdb, local_pdb_dir=args.pdbdir, show=args.show)
+        dataname = f"pdb_{args.pdb}.txt"
+
     else:
         parser.print_help(sys.stderr)
 
+
+    cue.save_data_with_constant_radii(data, 0, args.outputdir / f"{dataname}.txt")
+
+    fig = plt.figure(figsize=(8, 8))
+    ax = fig.add_subplot(111, projection="3d")
+    ax.scatter(data[:, 0], data[:, 1], data[:, 2], s=1, c="blue")
+    ax.set_box_aspect((np.ptp(data[:,0]), np.ptp(data[:,1]), np.ptp(data[:,2])))
+    plt.savefig(args.outputdir / f"{dataname}.pdf")
+
+    if args.show:
+        plt.show()
 
 
 if __name__ == "__main__":
