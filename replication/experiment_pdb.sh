@@ -1,8 +1,13 @@
 #!/usr/bin/env bash
 
-CODE=${1}
-timeLimit=5
-nSolve=20
+
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+. "${script_dir}/experiment_pdb.sh-parsing.sh" || { echo "Couldn't find 'experiment_pdb.sh-parsing.sh' parsing library in the '$script_dir' directory"; exit 1; }
+
+# vvv  PLACE YOUR CODE HERE  vvv
+printf 'Value of --%s: %s\n' 'timeLimit' "$_arg_timelimit"
+printf 'Value of --%s: %s\n' 'nSolve' "$_arg_nsolve"
+printf 'Value of --%s: %s\n' 'CODE' "$_arg_code"
 
 # Setting directories.
 origDir=$(pwd)
@@ -16,7 +21,7 @@ projectDir="${replDir}/../"
 cd $projectDir
 #
 
-DATA=pdb_${CODE}
+DATA="pdb_${_arg_code}"
 
 # data generation and optiperslp output should be deterministic.
 UUID=$(uv run -p 3.14 --no-project -m uuid -u uuid7)
@@ -25,11 +30,11 @@ DATADIR="${replDir}/${FOLDER}"
 
 if [ ! -f "${DATADIR}/${DATA}.txt" ]; then
     echo "${DATADIR}/${DATA}.txt not found; generating data..."
-    uv run cf_generate_data pdb "${CODE}" -o "${DATADIR}"
+    uv run cf_generate_data pdb "${_arg_code}" -o "${DATADIR}"
 else
     echo "${DATADIR}/${DATA}.txt found."
 fi
 
-run_experiments	"${DATADIR}" "${DATA}" "$timeLimit" "$nSolve"
+run_experiments	"${DATADIR}" "${DATA}" "$_arg_timelimit" "$_arg_nsolve"
 
 cd $origDir

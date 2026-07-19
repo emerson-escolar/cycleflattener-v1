@@ -12,7 +12,7 @@ import numpy as np
 
 import Bio.PDB as pdb
 
-
+from platformdirs import user_cache_path
 
 def construct_parser() -> argparse.ArgumentParser:
     desc = textwrap.dedent('''\
@@ -58,7 +58,7 @@ def construct_parser() -> argparse.ArgumentParser:
     pdb_parser.add_argument("pdb", type=str, help="pdb code")
     pdb_parser.add_argument("--pdbdir", type=pathlib.Path,
                             help="path to directory where to save pdb files",
-                            default=pathlib.Path.cwd())
+                            default=None)
 
     return parser
 
@@ -68,6 +68,12 @@ def generate_pdb_data(outputdir:pathlib.Path,
                       pdb_code:str,
                       local_pdb_dir:pathlib.Path,
                       show=False):
+    if local_pdb_dir is None:
+        cache_dir = user_cache_path("cycleflattener")
+        local_pdb_dir = cache_dir / "pdb"
+    print(f"PDB storage in {local_pdb_dir}")
+    local_pdb_dir.mkdir(parents=True, exist_ok=True)
+
     pdbl = pdb.PDBList(pdb=str(local_pdb_dir))
     fname = pdbl.retrieve_pdb_file(pdb_code, file_format="mmCif")
     structure = pdb.MMCIFParser().get_structure(pdb_code, fname)
