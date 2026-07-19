@@ -21,8 +21,8 @@ def construct_parser() -> argparse.ArgumentParser:
 
     common_parser = argparse.ArgumentParser(add_help = False)
     common_parser.add_argument("--outputdir", "-o", type=pathlib.Path,
-                                help="path to directory where to save output",
-                                default=pathlib.Path(__file__).resolve().parent / "testdata")
+                               help="path to directory where to save output",
+                               default=pathlib.Path.cwd())
     common_parser.add_argument("--show", action="store_true", help="plot and show data")
 
     parser = argparse.ArgumentParser(description=desc, formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -58,7 +58,7 @@ def construct_parser() -> argparse.ArgumentParser:
     pdb_parser.add_argument("pdb", type=str, help="pdb code")
     pdb_parser.add_argument("--pdbdir", type=pathlib.Path,
                             help="path to directory where to save pdb files",
-                            default=pathlib.Path(__file__).resolve().parent)
+                            default=pathlib.Path.cwd())
 
     return parser
 
@@ -68,9 +68,6 @@ def generate_pdb_data(outputdir:pathlib.Path,
                       pdb_code:str,
                       local_pdb_dir:pathlib.Path,
                       show=False):
-    # if local_pdb_dir is None:
-    #     local_pdb_dir=pathlib.Path.cwd()
-
     pdbl = pdb.PDBList(pdb=str(local_pdb_dir))
     fname = pdbl.retrieve_pdb_file(pdb_code, file_format="mmCif")
     structure = pdb.MMCIFParser().get_structure(pdb_code, fname)
