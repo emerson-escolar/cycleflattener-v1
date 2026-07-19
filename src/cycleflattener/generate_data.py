@@ -134,7 +134,7 @@ def main():
 
     elif args.type == "pdb":
         data = generate_pdb_data(args.outputdir, pdb_code=args.pdb, local_pdb_dir=args.pdbdir, show=args.show)
-        dataname = f"pdb_{args.pdb}.txt"
+        dataname = f"pdb_{args.pdb}"
 
     else:
         parser.print_help(sys.stderr)

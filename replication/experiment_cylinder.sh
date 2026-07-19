@@ -37,7 +37,7 @@ DATADIR="${replDir}/${FOLDER}"
 
 if [ ! -f "${DATADIR}/${DATA}.txt" ]; then
     echo "${DATADIR}/${DATA}.txt not found; generating data..."
-    uv run ./tests/generate_testdata.py cylinder --num "$NUM" --radius_str "$RADIUS" --height_str "$HEIGHT" -o "${DATADIR}"
+    uv run cf_generate_data cylinder --num "$NUM" --radius_str "$RADIUS" --height_str "$HEIGHT" -o "${DATADIR}"
     echo "${DATADIR}/${DATA}.txt generated."
 else
     echo "${DATADIR}/${DATA}.txt found."

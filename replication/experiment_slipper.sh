@@ -37,7 +37,7 @@ DATADIR="${replDir}/${FOLDER}"
 
 if [ ! -f "${DATADIR}/${DATA}.txt" ]; then
     echo "${DATADIR}/${DATA}.txt not found; generating data..."
-    uv run ./tests/generate_testdata.py slipper --bs "$BS" --fs "$FS" --fr "$FR" -o "${DATADIR}"
+    uv run cf_generate_data slipper --bs "$BS" --fs "$FS" --fr "$FR" -o "${DATADIR}"
     echo "${DATADIR}/${DATA}.txt generated."
 else
     echo "${DATADIR}/${DATA}.txt found."

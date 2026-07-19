@@ -35,7 +35,7 @@ DATADIR="${replDir}/${FOLDER}"
 
 if [ ! -f "${DATADIR}/${DATA}.txt" ]; then
     echo "${DATADIR}/${DATA}.txt not found; generating data..."
-    uv run ./tests/generate_testdata.py torus --num "${NUM}" --radius_str "${_arg_radius}" --tube_radius_str "${_arg_tuberadius}" -o "${DATADIR}"
+    uv run cf_generate_data torus --num "${NUM}" --radius_str "${_arg_radius}" --tube_radius_str "${_arg_tuberadius}" -o "${DATADIR}"
     echo "${DATADIR}/${DATA}.txt generated."
 else
     echo "${DATADIR}/${DATA}.txt found."

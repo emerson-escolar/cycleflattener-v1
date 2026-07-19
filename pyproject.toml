@@ -36,3 +36,7 @@ dev = [
     "cycleflattener",
     "pytest>=9.0.2",
 ]
+
+
+[project.scripts]
+cf_generate_data = "cycleflattener.generate_data:main"
