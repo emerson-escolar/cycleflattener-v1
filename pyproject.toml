@@ -41,3 +41,4 @@ dev = [
 
 [project.scripts]
 cf_generate_data = "cycleflattener.generate_data:main"
+cf_viewer = "cycleflattener.viewer:main"
