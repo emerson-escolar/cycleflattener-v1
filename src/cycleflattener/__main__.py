@@ -1,5 +1,5 @@
-import cycleflattener.aohcp_longest
+import cycleflattener.aohcp_main
 
 
 if __name__ == "__main__":
-    cycleflattener.aohcp_longest.main()
+    cycleflattener.aohcp_main.main()
