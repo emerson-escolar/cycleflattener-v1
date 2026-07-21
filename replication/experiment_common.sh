@@ -28,6 +28,6 @@ run_experiments() {
     for RATIO in 0.1 0.2 0.4; do
 	optiOutDir="${DATADIR}/$(printf "%04d" ${timeLimit})sec_${RATIO}ratio_${UUID}"
 	mkdir -p "${optiOutDir}"
-	${TIMESCRIPT} -v uv run main.py -i "${DATADIR}" -o "${optiOutDir}" "${DATA}" -r "${RATIO}" -c ./cplex_config_60s_mem_18deg.py -t "${timeLimit}" -n "${nSolve}" 2>&1 | tee "${optiOutDir}/output.log"
+	${TIMESCRIPT} -v uv run -m cycleflattener -i "${DATADIR}" -o "${optiOutDir}" "${DATA}" -r "${RATIO}" -c ./cplex_config_60s_mem_18deg.py -t "${timeLimit}" -n "${nSolve}" 2>&1 | tee "${optiOutDir}/output.log"
     done
 }

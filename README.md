@@ -13,7 +13,16 @@
 
 # Usage
 
-TODO
+1. The main script is `aohcp_longest.py`. You can run this by calling:
+   ```
+   uv run aohcp_longest.py
+   ```
+   in the same folder. Or,
+   ```
+   uv run -m cycleflattener
+   ```
+   anywhere within the project.
+
 
 
 # Running the provided experiments
@@ -24,3 +33,13 @@ TODO
    ```
 
 2. Change into `replication` directory and run the scripts.
+
+
+
+# Running tests.
+
+Run
+```
+uv run pytest
+```
+in the base directory.
