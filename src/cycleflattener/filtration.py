@@ -7,6 +7,8 @@ import networkx as nx
 
 import cycleflattener.angleoptimizer as ao
 
+from typing import Any
+
 def list_to_lookupdict(x:list):
     return {v:k for k,v in enumerate(x)}
 
@@ -18,8 +20,8 @@ def compute_angle(a, b):
     return rad
 
 class Filtration:
-    vertex_coordinates: np.array
-    simplices: list[dict[str, any]]
+    vertex_coordinates: np.ndarray
+    simplices: list[dict[str, Any]]
     boundaries: list[dict[int, float]]
     cycles: list
 
@@ -170,14 +172,14 @@ class Filtration:
         return list(__generator(neighborhood_vertexindices))
 
 
-    def get_simplexindices_satisfying(self, dim:int, maxbirth=np.inf, nbhd:list=None) -> list:
+    def get_simplexindices_satisfying(self, dim:int, maxbirth=np.inf, nbhd:list|None=None) -> list:
         if nbhd is None:
-            nbhd = range(self.num_simplices)
+            nbhd = list(range(self.num_simplices))
         return [i for i in nbhd if
                 (self.simplices[i][type(self).KEY_birth] <= maxbirth) and
                 (self.simplices[i][type(self).KEY_dim] == dim)]
 
-    def context_triangles(self, maxbirth=np.inf, nbhd:list=None):
+    def context_triangles(self, maxbirth=np.inf, nbhd:list|None=None):
         # Member functions with "context" depend on the context of
         #  maxbirth and nbhd
         # i.e.\ taken in the context of a subsmplicial complex defined by these parameters.
@@ -191,7 +193,7 @@ class Filtration:
     def get_boundary_coeff(self, query_simplexindex, face_simplexindex):
         return self.boundaries[query_simplexindex].get(query_simplexindex, 0)
 
-    def context_boundary_matrix(self, dim:int, maxbirth=np.inf, nbhd:list=None):
+    def context_boundary_matrix(self, dim:int, maxbirth=np.inf, nbhd:list|None=None)->ssm.csr_matrix:
         # Member functions with "context" depend on the context of
         #  maxbirth and nbhd
         # i.e.\ taken in the context of a subsmplicial complex defined by these parameters.
@@ -218,7 +220,7 @@ class Filtration:
                               shape=(len(dwn_simplices),len(cur_simplices)))
 
 
-    def context_exterior_angles_matrix(self, maxbirth=np.inf, nbhd:list=None):
+    def context_exterior_angles_matrix(self, maxbirth=np.inf, nbhd:list|None=None):
         # Member functions with "context" depend on the context of
         #  maxbirth and nbhd
         # i.e.\ taken in the context of a subsmplicial complex defined by these parameters.
@@ -279,7 +281,7 @@ class Filtration:
 
     def get_1_cycle_geometric_length(self, cycle) -> float:
         #  cycle is a dictionary {simplexindex:coeff} representing a cycle.
-        ans = 0
+        ans = 0.0
         for simplexindex, coeff in cycle.items():
             vlist = self.get_simplex_vlist(simplexindex)
             ans += np.linalg.norm(self.vertex_coordinates[vlist[0], :]
@@ -306,7 +308,7 @@ class Filtration:
             print(simple_cycle)
 
 
-    def context_vectorize_1_cycle(self, cycle, maxbirth=np.inf, nbhd:list=None):
+    def context_vectorize_1_cycle(self, cycle, maxbirth=np.inf, nbhd:list|None=None):
         # Member functions with "context" depend on the context of
         #  maxbirth and nbhd
         # i.e.\ taken in the context of a subsmplicial complex defined by these parameters.
@@ -331,7 +333,7 @@ class Filtration:
 
 
     def context_vector_to_1_cycle(self, vec:ssm.csr_matrix,
-                                  maxbirth=np.inf, nbhd:list=None):
+                                  maxbirth=np.inf, nbhd:list|None=None):
         # Member functions with "context" depend on the context of
         #  maxbirth and nbhd
         # i.e.\ taken in the context of a subsmplicial complex defined by these parameters.
@@ -348,7 +350,7 @@ class Filtration:
         return cycle
 
 
-    def context_solve_aohcp(self, cycle, maxbirth=np.inf, nbhd:list=None,
+    def context_solve_aohcp(self, cycle, maxbirth=np.inf, nbhd:list|None=None,
                             qcr_shift:bool=False,
                             export_file=None,
                             cplex_config_file=None, timelimit=None):
@@ -364,7 +366,7 @@ class Filtration:
 
 
     def context_solve_aohcp_repeated(self, cycle,
-                                     maxbirth=np.inf, nbhd:list=None,
+                                     maxbirth=np.inf, nbhd:list|None=None,
                                      qcr_shift:bool=False,
                                      export_file=None,
                                      cplex_config_file=None,

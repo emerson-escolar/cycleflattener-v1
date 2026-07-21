@@ -7,7 +7,7 @@ class AngleOptimizer:
     mdl: docplex.mp.model.Model
     z: ssm.csr_matrix
 
-    def __init__(self, Qhat:ssm.csr_matrix, b:Optional[np.array], A:ssm.csr_matrix, z:ssm.csr_matrix,
+    def __init__(self, Qhat:ssm.csr_matrix, b:Optional[np.ndarray], A:ssm.csr_matrix, z:ssm.csr_matrix,
                  model_name, cplex_config_file=None, timelimit=None):
         self.A = A
         self.z = z

@@ -66,7 +66,7 @@ def construct_parser() -> argparse.ArgumentParser:
 
 def generate_pdb_data(outputdir:pathlib.Path,
                       pdb_code:str,
-                      local_pdb_dir:pathlib.Path,
+                      local_pdb_dir:pathlib.Path|None,
                       show=False):
     if local_pdb_dir is None:
         cache_dir = user_cache_path("cycleflattener")
@@ -79,8 +79,11 @@ def generate_pdb_data(outputdir:pathlib.Path,
     structure = pdb.MMCIFParser().get_structure(pdb_code, fname)
 
     all_atoms = []
+    print(f"len(structure): {len(structure)}")
     for model in structure:
+        print(f"len(model): {len(model)}")
         for chain in model:
+            print(f"len(chain): {len(chain)}")
             for residue in chain:
                 for atom in residue:
                     all_atoms.append(atom.coord)
