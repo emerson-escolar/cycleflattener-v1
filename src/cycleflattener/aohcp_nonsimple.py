@@ -27,6 +27,7 @@ def main():
     for l_ord, idx_lifespan  in enumerate(sorted_origidx_lifespan):
         idx, _ = idx_lifespan
         cycle, bd = filt.cycles[idx]
+        # print(list(filt.get_1_cycle_vertices(cycle)))
         if len(list(filt.get_1_cycle_vertices(cycle))) >= 2:
             print(f"Non-simple cycle found as {l_ord}th lifespan, cycle index {idx}")
             break

@@ -42,3 +42,4 @@ dev = [
 [project.scripts]
 cf_generate_data = "cycleflattener.generate_data:main"
 cf_viewer = "cycleflattener.viewer:main"
+cf_aohcp_nonsimple = "cycleflattener.aohcp_nonsimple:main"
