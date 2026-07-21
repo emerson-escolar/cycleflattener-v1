@@ -11,7 +11,7 @@ import argparse
 import textwrap
 
 
-def construct_parser() -> argparse.ArgumentParser:
+def construct_base_parser() -> argparse.ArgumentParser:
     desc = textwrap.dedent('''\
     Program for performing angle optimization on the cycle associated to the chosen interval.
     The chosen interval is specified by an integer w={args.lifespan_which_ordinal}, which
@@ -39,15 +39,6 @@ def construct_parser() -> argparse.ArgumentParser:
                         help="path to directory where outputs are stored",
                         default=pathlib.Path.cwd())
 
-    parser.add_argument("--lifespan_which_ordinal", "-w", type=int,
-                        help="which cycle to work on, specified by ordinal (0th, 1st, 2nd, ...) in lifespans ordered in decreasing order.\
-                        Default value of 0 means to take the cycle with longest lifespan.",
-                        default=0)
-
-    parser.add_argument("--lifespan_ratio", "-r", type=float,
-                        help="lifespan ratio r. Alpha complex constructed at b+(d-b)*r",
-                        default=0.5)
-
     parser.add_argument("--shift", action="store_true", help="shift eigenvalues by 2*pi")
 
     parser.add_argument("--cplex_config_file", "-c", type=pathlib.Path,
@@ -60,6 +51,21 @@ def construct_parser() -> argparse.ArgumentParser:
     parser.add_argument("--nsolves", "-n", type=int,
                         help="Number of times to call the optimizer.",
                         default=None)
+
+    parser.add_argument("--lifespan_ratio", "-r", type=float,
+                        help="lifespan ratio r. Alpha complex constructed at b+(d-b)*r",
+                        default=0.5)
+
+    return parser
+
+
+def construct_parser() -> argparse.ArgumentParser:
+    parser = construct_base_parser()
+
+    parser.add_argument("--lifespan_which_ordinal", "-w", type=int,
+                        help="which cycle to work on, specified by ordinal (0th, 1st, 2nd, ...) in lifespans ordered in decreasing order.\
+                        Default value of 0 means to take the cycle with longest lifespan.",
+                        default=0)
 
     return parser
 
@@ -87,8 +93,7 @@ def prepare_cplex_config(args):
 
 
 def get_lth_cycle_bd(filt, l_ord):
-    lifespans = filt.get_lifespans()
-    sorted_origidx_lifespan = sorted(zip(range(len(lifespans)), lifespans), key=lambda x: x[1], reverse=True)
+    sorted_origidx_lifespan = filt.get_cycleindex_lifespans_nonincreasing()
     idx = sorted_origidx_lifespan[l_ord][0]
 
     return filt.cycles[idx]

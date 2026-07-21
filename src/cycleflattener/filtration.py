@@ -124,6 +124,10 @@ class Filtration:
         ans = [bd[1]-bd[0] for _,bd in self.cycles]
         return ans
 
+    def get_cycleindex_lifespans_nonincreasing(self):
+        lifespans = self.get_lifespans()
+        return sorted(zip(range(len(lifespans)), lifespans), key=lambda x: x[1], reverse=True)
+
 
     def __vindex_fset_to_edge_simplexindex(self):
         edges = self.get_simplexindices_satisfying(dim=1)
