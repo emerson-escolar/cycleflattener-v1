@@ -71,7 +71,6 @@ def construct_parser() -> argparse.ArgumentParser:
 
 
 
-
 def load_filtration(args):
     filt = cycleflattener.filtration.Filtration()
 
@@ -92,57 +91,73 @@ def prepare_cplex_config(args):
     return cf
 
 
-def get_lth_cycle_bd(filt, l_ord):
-    sorted_origidx_lifespan = filt.get_cycleindex_lifespans_nonincreasing()
-    idx = sorted_origidx_lifespan[l_ord][0]
-
-    return filt.cycles[idx]
-
-
-def main_on_lth_cycle(args, filt, l_ord):
-    cf = prepare_cplex_config(args)
-    args.outputdir.mkdir(exist_ok=True, parents=True)
-
-    cycle, bd = get_lth_cycle_bd(filt, l_ord)
-    relbirth = bd[0] + (bd[1]-bd[0]) * args.lifespan_ratio
-
-    # display optimization target
+def print_z0_cycle_details(filt:cycleflattener.filtration.Filtration, cycle, bd:tuple|None):
     print("******************************")
     print("optimization target:")
+    print(f"z0: {cycle}")
+    print("vertices: ", end="")
     filt.print_1_cycle(cycle)
-    viz.plot_data_and_cycle(filt, cycle, "red",
-                            args.outputdir / f"{args.inputname}_{l_ord}th_cyclebefore.pdf")
-    plt.close()
+
+    print(f"||z0||_0: {len(cycle)}")
+    print(f"l(z0): {filt.get_1_cycle_geometric_length(cycle)}")
+    print(f"k(z0): {filt.get_1_cycle_total_absolute_curvature(cycle)}")
+    if bd is not None:
+        print(f"[b,d): {bd}")
     print("******************************")
 
-    # details:
+
+def print_context(filt, relbirth):
+    print("******************************")
+    print("optimization context:")
+    print(f"r: {relbirth}")
     print(f"n0: {filt.num_vertices}")
     print(f"n1: {len(filt.get_simplexindices_satisfying(dim=1,maxbirth=relbirth))}")
     print(f"n2: {len(filt.get_simplexindices_satisfying(dim=2,maxbirth=relbirth))}")
-    print(f"||z0||_0: {len(cycle)}")
-    print(f"l(z0): {filt.get_1_cycle_geometric_length(cycle)}")
-    print(f"[b,d): {bd}")
-    print(f"z0: {cycle}")
     print("******************************")
 
-    print(f"r: {relbirth}")
 
-    cycles_v2 = [sl.CycleV2(birth=bd[0],
-                            death=bd[1],
+def main():
+    args = construct_parser().parse_args()
+    filt = load_filtration(args)
+    l_ord = args.lifespan_which_ordinal
+    main_on_lth_cycle(args, filt, l_ord)
+
+
+def main_on_lth_cycle(args, filt, l_ord):
+    sorted_origidx_lifespan = filt.get_cycleindex_lifespans_nonincreasing()
+    idx = sorted_origidx_lifespan[l_ord][0]
+    cycle, bd = filt.cycles[idx]
+    relbirth = bd[0] + (bd[1]-bd[0]) * args.lifespan_ratio
+
+    main_on_cycle(args, filt, cycle, bd, relbirth, f"{l_ord}th")
+
+
+def main_on_cycle(args, filt, cycle, bd:tuple|None, relbirth, desc, ):
+    cf = prepare_cplex_config(args)
+    args.outputdir.mkdir(exist_ok=True, parents=True)
+
+    print_z0_cycle_details(filt, cycle, bd)
+    print_context(filt, relbirth)
+
+    # display optimization target
+    viz.plot_data_and_cycle(filt, cycle, "red",
+                            args.outputdir / f"{args.inputname}_{desc}_cyclebefore.pdf")
+    plt.close()
+
+    cycles_v2 = [sl.CycleV2(birth=None if bd is None else bd[0],
+                            death=None if bd is None else bd[1],
                             length=filt.get_1_cycle_geometric_length(cycle),
                             kappa=filt.get_1_cycle_total_absolute_curvature(cycle),
                             cycle=cycle), ]
 
-
-
     # solve and report results
     i = 0
     for soln_cycle, soln_value in filt.context_solve_aohcp_repeated(cycle, maxbirth=relbirth, qcr_shift=args.shift,
-                                                                    export_file=args.outputdir / f"{args.inputname}_{l_ord}th.lp",
+                                                                    export_file=args.outputdir / f"{args.inputname}_{desc}.lp",
                                                                     cplex_config_file=cf, timelimit=args.timelimit, n_epoch=args.nsolves):
         i += 1
         viz.plot_data_and_cycle(filt, soln_cycle, "green",
-                                args.outputdir / f"{args.inputname}_{l_ord}th_cycleafter_{i}.pdf")
+                                args.outputdir / f"{args.inputname}_{desc}_cycleafter_{i}.pdf")
 
         print(f"z_{i}: computed kappa: {soln_value} and {filt.get_1_cycle_total_absolute_curvature(soln_cycle)}")
 
@@ -152,18 +167,9 @@ def main_on_lth_cycle(args, filt, l_ord):
                              cycle=soln_cycle)
         cycles_v2.append(cycle_p)
 
-    with open(args.outputdir / f"{args.inputname}_{l_ord}th_solutions_v2.json", "w") as fp:
+    with open(args.outputdir / f"{args.inputname}_{desc}_solutions_v2.json", "w") as fp:
         fp.write(sl.CyclesFileV2(original_cycle_indices=[0,],
                                  cycles=cycles_v2).model_dump_json(indent=2))
-
-
-def main():
-    args = construct_parser().parse_args()
-
-    filt = load_filtration(args)
-    l_ord = args.lifespan_which_ordinal
-
-    main_on_lth_cycle(args, filt, l_ord)
 
 
 if __name__ == "__main__":
