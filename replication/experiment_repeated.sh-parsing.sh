@@ -4,6 +4,7 @@
 # ARG_OPTIONAL_SINGLE([timeLimit],[],[time limit for each solve],[1])
 # ARG_OPTIONAL_SINGLE([nSolve],[],[number of times to call solver],[3])
 # ARG_OPTIONAL_SINGLE([ratio],[],[lifespan ratio to run on],[0.2])
+# ARG_OPTIONAL_BOOLEAN([nouuid],[],[do not append uuid to outputs])
 # ARG_POSITIONAL_SINGLE([DIR],[directory of data])
 # ARG_POSITIONAL_SINGLE([DATANAME],[name of data])
 # ARGBASH_SET_DELIM([ =])
@@ -29,7 +30,7 @@ die()
 
 evaluate_strictness()
 {
-	! [[ "$2" =~ ^-(-(timeLimit|nSolve|ratio|DIR|DATANAME|help)$|[h]) ]] || die "You have passed '$2' as a value of argument '$1', which makes it look like that you have omitted the actual value, since '$2' is an option accepted by this script. This is considered a fatal error."
+	! [[ "$2" =~ ^-(-(timeLimit|nSolve|ratio|nouuid|DIR|DATANAME|help)$|[h]) ]] || die "You have passed '$2' as a value of argument '$1', which makes it look like that you have omitted the actual value, since '$2' is an option accepted by this script. This is considered a fatal error."
 }
 
 
@@ -48,17 +49,19 @@ _arg_dataname=
 _arg_timelimit="1"
 _arg_nsolve="3"
 _arg_ratio="0.2"
+_arg_nouuid="off"
 
 
 print_help()
 {
 	printf '%s\n' "Run additional experiments in folder"
-	printf 'Usage: %s [--timeLimit <arg>] [--nSolve <arg>] [--ratio <arg>] [-h|--help] <DIR> <DATANAME>\n' "$(basename "$0")"
+	printf 'Usage: %s [--timeLimit <arg>] [--nSolve <arg>] [--ratio <arg>] [--(no-)nouuid] [-h|--help] <DIR> <DATANAME>\n' "$(basename "$0")"
 	printf '\t%s\n' "<DIR>: directory of data"
 	printf '\t%s\n' "<DATANAME>: name of data"
 	printf '\t%s\n' "--timeLimit: time limit for each solve (default: '1')"
 	printf '\t%s\n' "--nSolve: number of times to call solver (default: '3')"
 	printf '\t%s\n' "--ratio: lifespan ratio to run on (default: '0.2')"
+	printf '\t%s\n' "--nouuid, --no-nouuid: do not append uuid to outputs (off by default)"
 	printf '\t%s\n' "-h, --help: Prints help"
 }
 
@@ -100,6 +103,10 @@ parse_commandline()
 			--ratio=*)
 				_arg_ratio="${_key##--ratio=}"
 				evaluate_strictness "$_key" "$_arg_ratio"
+				;;
+			--no-nouuid|--nouuid)
+				_arg_nouuid="on"
+				test "${1:0:5}" = "--no-" && _arg_nouuid="off"
 				;;
 			-h|--help)
 				print_help

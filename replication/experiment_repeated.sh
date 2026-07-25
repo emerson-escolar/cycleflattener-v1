@@ -13,6 +13,7 @@ script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 printf 'Value of --%s: %s\n' 'timeLimit' "$_arg_timelimit"
 printf 'Value of --%s: %s\n' 'nSolve' "$_arg_nsolve"
 printf 'Value of --%s: %s\n' 'ratio' "$_arg_ratio"
+printf 'Value of --%s: %s\n' 'nouuid' "$_arg_nouuid"
 printf "Value of '%s': %s\\n" 'DIR' "$_arg_dir"
 printf "Value of '%s': %s\\n" 'DATANAME' "$_arg_dataname"
 
@@ -35,11 +36,15 @@ DATANAME="$_arg_dataname"
 replDir=$(dirname -- "$(readlink -f -- "$BASH_SOURCE")")
 projectDir=$replDir/../
 
-UUID=$(uv run -p 3.14 --no-project -m uuid -u uuid7)
+if [ "$_arg_nouuid" = off ]; then
+    UUID="_$(uv run -p 3.14 --no-project -m uuid -u uuid7)"
+else
+    UUID=""
+fi
 
 for JJ in {1..5}; do
     for II in {1..1}; do
-	optiOutDir="${DIR}/$(printf "%04d" ${timeLimit})sec_${RATIO}ratio_repeats_${UUID}/$(printf "%04d" $timeLimit)sec_${RATIO}ratio_trial$(printf %03d $JJ)_${II}"
+	optiOutDir="${DIR}/$(printf "%04d" ${timeLimit})sec_${RATIO}ratio_repeats${UUID}/$(printf "%04d" $timeLimit)sec_${RATIO}ratio_trial$(printf %03d $JJ)_${II}"
 	echo "Writing to ${optiOutDir}"
 	mkdir -p "${optiOutDir}"
 	uv run -m cycleflattener -i "${DIR}" -o "${optiOutDir}" -r "${RATIO}" -c ./cplex_config_60s_mem_18deg.py -t "${timeLimit}" -n "${nSolve}" "${DATANAME}" 2>&1 | tee $optiOutDir/output.log &
