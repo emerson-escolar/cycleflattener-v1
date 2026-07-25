@@ -12,6 +12,8 @@ import pandas as pd
 
 import matplotlib.pyplot as plt
 
+import sys
+
 
 def construct_parser() -> argparse.ArgumentParser:
     desc = textwrap.dedent('''\
@@ -59,6 +61,12 @@ def plot_histo(data:pd.Series, bins:int, xlabel:str, name:str, outputdir:pathlib
     if show:
         plt.show(block=True)
 
+def write_output(ks, fp):
+    print(f"Worst kappa: {max(ks)/np.pi} \\pi", file=fp)
+    print(f"Best kappa: {min(ks)/np.pi} \\pi", file=fp)
+    print(f"Average kappa: {np.mean(ks)/np.pi} \\pi", file=fp)
+    print(f"Stddev kappa: {np.std(ks)/np.pi} \\pi", file=fp)
+
 def main():
     args = construct_parser().parse_args()
 
@@ -94,12 +102,11 @@ def main():
         for k in ks:
             fp.write(f"{k / np.pi} \\pi\n")
 
-    print(f"Worst kappa: {max(ks)/np.pi} \\pi")
-    print(f"Best kappa: {min(ks)/np.pi} \\pi")
-    print(f"Average kappa: {np.mean(ks)/np.pi} \\pi")
-    print(f"Stddev kappa: {np.std(ks)/np.pi} \\pi")
+    with open(outputdir/ "kappas_stats.txt", "w") as fp:
+        write_output(ks, fp)
 
-
+    write_output(ks, sys.stdout)
+    sys.stdout.flush()
 
 
 if __name__ == "__main__":
