@@ -3,6 +3,7 @@ import itertools
 import numpy as np
 import scipy.spatial.distance as ssd
 import scipy.sparse as ssm
+import sklearn.decomposition as sd
 import networkx as nx
 
 import cycleflattener.angleoptimizer as ao
@@ -306,6 +307,13 @@ class Filtration:
 
         return ans[0,0]
 
+    def get_1_cycle_PCA_variance_ratio(self, cycle):
+        involved_vertices = list(set().union(*self.get_1_cycle_vertices(cycle)))
+
+        data = self.vertex_coordinates[involved_vertices, :]
+        pca = sd.PCA().fit(data)
+
+        return pca.explained_variance_ratio_
 
     def print_1_cycle(self, cycle):
         for simple_cycle in self.get_1_cycle_vertices(cycle):

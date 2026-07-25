@@ -137,7 +137,9 @@ def main():
         print(size_row(filt, cycles_p[1].filtration_value, x))
         print(cycle_row(filt, cycles_p[1:], x))
 
-
+        for i, cycle in enumerate(cycles_p):
+            eratio = filt.get_1_cycle_PCA_variance_ratio(cycle.cycle)
+            print(f"z{i}), explained variance ratio for first two: {eratio[0] + eratio[1]}")
 
 
 
