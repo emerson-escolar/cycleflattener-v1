@@ -133,7 +133,10 @@ def main():
         data = sl.CyclesFileV2(**json.load(fp))
         cycles_p = data.cycles
 
+        print("Initial row:")
         print(initial_row(filt, cycles_p[0], x))
+
+        print("\nSolutions:")
         print(size_row(filt, cycles_p[1].filtration_value, x))
         print(cycle_row(filt, cycles_p[1:], x))
 
