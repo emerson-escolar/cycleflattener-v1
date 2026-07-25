@@ -132,7 +132,7 @@ def main_on_lth_cycle(args, filt, l_ord):
     main_on_cycle(args, filt, cycle, bd, relbirth, f"{l_ord}th")
 
 
-def main_on_cycle(args, filt, cycle, bd:tuple|None, relbirth, desc, ):
+def main_on_cycle(args, filt, cycle, bd:tuple|None, relbirth, desc):
     cf = prepare_cplex_config(args)
     args.outputdir.mkdir(exist_ok=True, parents=True)
 
