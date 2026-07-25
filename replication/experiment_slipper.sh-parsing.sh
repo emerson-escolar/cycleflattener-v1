@@ -3,6 +3,7 @@
 # Created by argbash-init v2.11.0
 # ARG_OPTIONAL_SINGLE([timeLimit],[],[time limit for each solve],[1])
 # ARG_OPTIONAL_SINGLE([nSolve],[],[number of times to call solver],[3])
+# ARG_OPTIONAL_BOOLEAN([nouuid],[],[do not append uuid to outputs])
 # ARG_POSITIONAL_SINGLE([BS])
 # ARG_POSITIONAL_SINGLE([FS])
 # ARG_POSITIONAL_SINGLE([FR])
@@ -29,7 +30,7 @@ die()
 
 evaluate_strictness()
 {
-	! [[ "$2" =~ ^-(-(timeLimit|nSolve|BS|FS|FR|help)$|[h]) ]] || die "You have passed '$2' as a value of argument '$1', which makes it look like that you have omitted the actual value, since '$2' is an option accepted by this script. This is considered a fatal error."
+	! [[ "$2" =~ ^-(-(timeLimit|nSolve|nouuid|BS|FS|FR|help)$|[h]) ]] || die "You have passed '$2' as a value of argument '$1', which makes it look like that you have omitted the actual value, since '$2' is an option accepted by this script. This is considered a fatal error."
 }
 
 
@@ -48,14 +49,16 @@ _arg_fr=
 # THE DEFAULTS INITIALIZATION - OPTIONALS
 _arg_timelimit="1"
 _arg_nsolve="3"
+_arg_nouuid="off"
 
 
 print_help()
 {
 	printf '%s\n' "Run experiments on slipper."
-	printf 'Usage: %s [--timeLimit <arg>] [--nSolve <arg>] [-h|--help] <BS> <FS> <FR>\n' "$(basename "$0")"
+	printf 'Usage: %s [--timeLimit <arg>] [--nSolve <arg>] [--(no-)nouuid] [-h|--help] <BS> <FS> <FR>\n' "$(basename "$0")"
 	printf '\t%s\n' "--timeLimit: time limit for each solve (default: '1')"
 	printf '\t%s\n' "--nSolve: number of times to call solver (default: '3')"
+	printf '\t%s\n' "--nouuid, --no-nouuid: do not append uuid to outputs (off by default)"
 	printf '\t%s\n' "-h, --help: Prints help"
 }
 
@@ -87,6 +90,10 @@ parse_commandline()
 			--nSolve=*)
 				_arg_nsolve="${_key##--nSolve=}"
 				evaluate_strictness "$_key" "$_arg_nsolve"
+				;;
+			--no-nouuid|--nouuid)
+				_arg_nouuid="on"
+				test "${1:0:5}" = "--no-" && _arg_nouuid="off"
 				;;
 			-h|--help)
 				print_help

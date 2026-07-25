@@ -37,9 +37,9 @@ projectDir=$replDir/../
 
 UUID=$(uv run -p 3.14 --no-project -m uuid -u uuid7)
 
-for JJ in {1..100}; do
-    for II in {1..2}; do
-	optiOutDir="${DIR}/repeats_${UUID}/$(printf "%04d" $timeLimit)sec_${RATIO}ratio_trial$(printf %03d $JJ)_${II}"
+for JJ in {1..5}; do
+    for II in {1..1}; do
+	optiOutDir="${DIR}/$(printf "%04d" ${timeLimit})sec_${RATIO}ratio_repeats_${UUID}/$(printf "%04d" $timeLimit)sec_${RATIO}ratio_trial$(printf %03d $JJ)_${II}"
 	echo "Writing to ${optiOutDir}"
 	mkdir -p "${optiOutDir}"
 	uv run -m cycleflattener -i "${DIR}" -o "${optiOutDir}" -r "${RATIO}" -c ./cplex_config_60s_mem_18deg.py -t "${timeLimit}" -n "${nSolve}" "${DATANAME}" 2>&1 | tee $optiOutDir/output.log &

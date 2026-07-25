@@ -5,6 +5,7 @@ echo "This is just a parsing library template, not the library - pass this file 
 exit 11  #)Created by argbash-init v2.11.0
 # ARG_OPTIONAL_SINGLE([timeLimit],,[time limit for each solve],[1])
 # ARG_OPTIONAL_SINGLE([nSolve],,[number of times to call solver],[3])
+# ARG_OPTIONAL_BOOLEAN([nouuid],,[do not append uuid to outputs])
 # ARG_POSITIONAL_SINGLE([BS])
 # ARG_POSITIONAL_SINGLE([FS])
 # ARG_POSITIONAL_SINGLE([FR])

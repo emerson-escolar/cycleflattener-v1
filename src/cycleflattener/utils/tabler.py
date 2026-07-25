@@ -139,7 +139,7 @@ def main():
 
         for i, cycle in enumerate(cycles_p):
             eratio = filt.get_1_cycle_PCA_variance_ratio(cycle.cycle)
-            print(f"z{i}), explained variance ratio for first two: {eratio[0] + eratio[1]}")
+            print(f"z{i}), explained variance ratio for first two PCA axes: {eratio[0] + eratio[1]}")
 
 
 

@@ -5,6 +5,7 @@
 # ARG_OPTIONAL_SINGLE([nSolve],[],[number of times to call solver],[3])
 # ARG_OPTIONAL_SINGLE([radius],[],[radius of cylinder],[1.0])
 # ARG_OPTIONAL_SINGLE([height],[],[height of cylinder],[2.0])
+# ARG_OPTIONAL_BOOLEAN([nouuid],[],[do not append uuid to outputs])
 # ARG_POSITIONAL_SINGLE([NUM],[number of points in data])
 # ARGBASH_SET_DELIM([ =])
 # ARG_OPTION_STACKING([getopt])
@@ -29,7 +30,7 @@ die()
 
 evaluate_strictness()
 {
-	! [[ "$2" =~ ^-(-(timeLimit|nSolve|radius|height|NUM|help)$|[h]) ]] || die "You have passed '$2' as a value of argument '$1', which makes it look like that you have omitted the actual value, since '$2' is an option accepted by this script. This is considered a fatal error."
+	! [[ "$2" =~ ^-(-(timeLimit|nSolve|radius|height|nouuid|NUM|help)$|[h]) ]] || die "You have passed '$2' as a value of argument '$1', which makes it look like that you have omitted the actual value, since '$2' is an option accepted by this script. This is considered a fatal error."
 }
 
 
@@ -48,17 +49,19 @@ _arg_timelimit="5"
 _arg_nsolve="3"
 _arg_radius="1.0"
 _arg_height="2.0"
+_arg_nouuid="off"
 
 
 print_help()
 {
 	printf '%s\n' "Run experiments on cylinder."
-	printf 'Usage: %s [--timeLimit <arg>] [--nSolve <arg>] [--radius <arg>] [--height <arg>] [-h|--help] <NUM>\n' "$(basename "$0")"
+	printf 'Usage: %s [--timeLimit <arg>] [--nSolve <arg>] [--radius <arg>] [--height <arg>] [--(no-)nouuid] [-h|--help] <NUM>\n' "$(basename "$0")"
 	printf '\t%s\n' "<NUM>: number of points in data"
 	printf '\t%s\n' "--timeLimit: time limit for each solve (default: '5')"
 	printf '\t%s\n' "--nSolve: number of times to call solver (default: '3')"
 	printf '\t%s\n' "--radius: radius of cylinder (default: '1.0')"
 	printf '\t%s\n' "--height: height of cylinder (default: '2.0')"
+	printf '\t%s\n' "--nouuid, --no-nouuid: do not append uuid to outputs (off by default)"
 	printf '\t%s\n' "-h, --help: Prints help"
 }
 
@@ -110,6 +113,10 @@ parse_commandline()
 			--height=*)
 				_arg_height="${_key##--height=}"
 				evaluate_strictness "$_key" "$_arg_height"
+				;;
+			--no-nouuid|--nouuid)
+				_arg_nouuid="on"
+				test "${1:0:5}" = "--no-" && _arg_nouuid="off"
 				;;
 			-h|--help)
 				print_help

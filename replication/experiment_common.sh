@@ -5,6 +5,7 @@ run_experiments() {
     local DATA="$2"
     local timeLimit="$3"
     local nSolve="$4"
+    local UUID="$5"
 
     if [ ! -f "${DATADIR}/gen_${DATA}_alphamap.txt" ]; then
 	echo "${DATADIR}/gen_${DATA}_alphamap.txt not found; applying optiperslp..."
@@ -14,11 +15,6 @@ run_experiments() {
 	echo "${DATADIR}/gen_${DATA}_alphamap.txt found."
     fi
 
-    # Hash output folders for different runs
-    # UUID version 7 was introduced in python 3.14...
-    # but cplex uses python 3.10
-    local UUID="$(uv run -p 3.14 --no-project -m uuid -u uuid7)"
-
     if [[ "$(uname)" == "Darwin" ]]; then
 	TIMESCRIPT=gtime
     else
@@ -26,7 +22,7 @@ run_experiments() {
     fi
 
     for RATIO in 0.1 0.2 0.4; do
-	optiOutDir="${DATADIR}/$(printf "%04d" ${timeLimit})sec_${RATIO}ratio_${UUID}"
+	optiOutDir="${DATADIR}/$(printf "%04d" ${timeLimit})sec_${RATIO}ratio${UUID}"
 	mkdir -p "${optiOutDir}"
 	${TIMESCRIPT} -v uv run -m cycleflattener -i "${DATADIR}" -o "${optiOutDir}" -r "${RATIO}" -c ./cplex_config_60s_mem_18deg.py -t "${timeLimit}" -n "${nSolve}" "${DATA}" 2>&1 | tee "${optiOutDir}/output.log"
     done
@@ -40,6 +36,7 @@ run_experiments_nonsimple() {
     local DATA="$2"
     local timeLimit="$3"
     local nSolve="$4"
+    local UUID="$5"
 
     if [ ! -f "${DATADIR}/gen_${DATA}_alphamap.txt" ]; then
 	echo "${DATADIR}/gen_${DATA}_alphamap.txt not found; applying optiperslp..."
@@ -49,11 +46,6 @@ run_experiments_nonsimple() {
 	echo "${DATADIR}/gen_${DATA}_alphamap.txt found."
     fi
 
-    # Hash output folders for different runs
-    # UUID version 7 was introduced in python 3.14...
-    # but cplex uses python 3.10
-    local UUID="$(uv run -p 3.14 --no-project -m uuid -u uuid7)"
-
     if [[ "$(uname)" == "Darwin" ]]; then
 	TIMESCRIPT=gtime
     else
@@ -61,7 +53,7 @@ run_experiments_nonsimple() {
     fi
 
     for RATIO in 0.1; do
-	optiOutDir="${DATADIR}/$(printf "%04d" ${timeLimit})sec_${RATIO}ratio_${UUID}"
+	optiOutDir="${DATADIR}/$(printf "%04d" ${timeLimit})sec_${RATIO}ratio${UUID}"
 	mkdir -p "${optiOutDir}"
 	${TIMESCRIPT} -v uv run cf_aohcp_nonsimple -i "${DATADIR}" -o "${optiOutDir}" -r "${RATIO}" -c ./cplex_config_60s_mem_18deg.py -t "${timeLimit}" -n "${nSolve}" "${DATA}" 2>&1 | tee "${optiOutDir}/output.log"
     done

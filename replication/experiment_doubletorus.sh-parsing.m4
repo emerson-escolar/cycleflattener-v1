@@ -7,6 +7,7 @@ exit 11  #)Created by argbash-init v2.11.0
 # ARG_OPTIONAL_SINGLE([nSolve],,[number of times to call solver],[3])
 # ARG_OPTIONAL_SINGLE([radius],,[major radius of torus],[2.0])
 # ARG_OPTIONAL_SINGLE([tuberadius],,[tube radius of torus],[1.0])
+# ARG_OPTIONAL_BOOLEAN([nouuid],,[do not append uuid to outputs])
 # ARG_POSITIONAL_SINGLE([NUM],[number of points in data])
 # ARGBASH_SET_DELIM([ =])
 # ARG_OPTION_STACKING([getopt])

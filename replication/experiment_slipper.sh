@@ -7,6 +7,7 @@ script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # vvv  PLACE YOUR CODE HERE  vvv
 printf 'Value of --%s: %s\n' 'timeLimit' "$_arg_timelimit"
 printf 'Value of --%s: %s\n' 'nSolve' "$_arg_nsolve"
+printf 'Value of --%s: %s\n' 'nouuid' "$_arg_nouuid"
 printf "Value of '%s': %s\\n" 'BS' "$_arg_bs"
 printf "Value of '%s': %s\\n" 'FS' "$_arg_fs"
 printf "Value of '%s': %s\\n" 'FR' "$_arg_fr"
@@ -43,7 +44,13 @@ else
     echo "${DATADIR}/${DATA}.txt found."
 fi
 
-run_experiments	"${DATADIR}" "${DATA}" "$_arg_timelimit" "$_arg_nsolve"
+if [ "$_arg_nouuid" = off ]; then
+    UUID="_$(uv run -p 3.14 --no-project -m uuid -u uuid7)"
+else
+    UUID=""
+fi
+
+run_experiments	"${DATADIR}" "${DATA}" "$_arg_timelimit" "$_arg_nsolve" "${UUID}"
 
 cd $origDir
 

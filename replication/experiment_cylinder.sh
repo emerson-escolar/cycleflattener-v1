@@ -8,6 +8,7 @@ printf 'Value of --%s: %s\n' 'timeLimit' "$_arg_timelimit"
 printf 'Value of --%s: %s\n' 'nSolve' "$_arg_nsolve"
 printf 'Value of --%s: %s\n' 'radius' "$_arg_radius"
 printf 'Value of --%s: %s\n' 'height' "$_arg_height"
+printf 'Value of --%s: %s\n' 'nouuid' "$_arg_nouuid"
 printf "Value of '%s': %s\\n" 'NUM' "$_arg_num"
 
 NUM="$_arg_num"
@@ -31,8 +32,12 @@ DATA=cylinder_${HEIGHT}_${RADIUS}_${NUM}
 
 
 # data generation
-UUID="$(uv run -p 3.14 --no-project -m uuid -u uuid7)"
-FOLDER="${DATA}_${UUID}"
+if [ "$_arg_nouuid" = off ]; then
+    UUID="_$(uv run -p 3.14 --no-project -m uuid -u uuid7)"
+else
+    UUID=""
+fi
+FOLDER="${DATA}${UUID}"
 DATADIR="${replDir}/${FOLDER}"
 
 if [ ! -f "${DATADIR}/${DATA}.txt" ]; then
@@ -43,7 +48,7 @@ else
     echo "${DATADIR}/${DATA}.txt found."
 fi
 
-run_experiments	"${DATADIR}" "${DATA}" "$_arg_timelimit" "$_arg_nsolve"
+run_experiments	"${DATADIR}" "${DATA}" "$_arg_timelimit" "$_arg_nsolve" "${UUID}"
 
 cd $origDir
 
