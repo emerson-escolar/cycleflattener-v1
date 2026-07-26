@@ -44,6 +44,8 @@ def construct_base_parser() -> argparse.ArgumentParser:
     parser.add_argument("--cplex_config_file", "-c", type=pathlib.Path,
                         help="cplex config file", default=None)
 
+    parser.add_argument("--nolp", action="store_true", help="do not save .lp file")
+
     parser.add_argument("--timelimit", "-t", type=int,
                         help="Sets the maximum time, in seconds, for one call to the optimizer. Overrides value in cplex_config_file",
                         default=None)
@@ -150,10 +152,14 @@ def main_on_cycle(args, filt, cycle, bd:tuple|None, relbirth, desc):
                             kappa=filt.get_1_cycle_total_absolute_curvature(cycle),
                             cycle=cycle), ]
 
+    export_file = None
+    if args.nolp == False:
+        export_file=args.outputdir / f"{args.inputname}_{desc}.lp"
+
     # solve and report results
     i = 0
     for soln_cycle, soln_value in filt.context_solve_aohcp_repeated(cycle, maxbirth=relbirth, qcr_shift=args.shift,
-                                                                    export_file=args.outputdir / f"{args.inputname}_{desc}.lp",
+                                                                    export_file=export_file,
                                                                     cplex_config_file=cf, timelimit=args.timelimit, n_epoch=args.nsolves):
         i += 1
         viz.plot_data_and_cycle(filt, soln_cycle, "green",
