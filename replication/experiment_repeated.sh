@@ -13,6 +13,8 @@ script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 printf 'Value of --%s: %s\n' 'timeLimit' "$_arg_timelimit"
 printf 'Value of --%s: %s\n' 'nSolve' "$_arg_nsolve"
 printf 'Value of --%s: %s\n' 'ratio' "$_arg_ratio"
+printf 'Value of --%s: %s\n' 'nRepeat' "$_arg_nrepeat"
+printf 'Value of --%s: %s\n' 'nParallel' "$_arg_nparallel"
 printf 'Value of --%s: %s\n' 'nouuid' "$_arg_nouuid"
 printf "Value of '%s': %s\\n" 'DIR' "$_arg_dir"
 printf "Value of '%s': %s\\n" 'DATANAME' "$_arg_dataname"
@@ -23,15 +25,6 @@ RATIO="$_arg_ratio"
 DIR="$_arg_dir"
 DATANAME="$_arg_dataname"
 
-# name of data folder (inside replication directory) and input name
-# FOLDER=C2_cylinder_2.0_1.0_500_019f4645-905d-7479-900d-ffd9195b399c
-# DATA=cylinder_2.0_1.0_500
-
-# FOLDER=slipper_2_1_1_30_30_20
-# DATA=slipper_2_1_1_30_30_20
-
-# FOLDER=S1_slipper_2_1_1_20_20_10
-# DATA=slipper_2_1_1_20_20_10
 
 replDir=$(dirname -- "$(readlink -f -- "$BASH_SOURCE")")
 projectDir=$replDir/../
@@ -42,8 +35,9 @@ else
     UUID=""
 fi
 
-for JJ in {1..5}; do
-    for II in {1..1}; do
+
+for ((JJ=1; JJ<=$_arg_nrepeat; JJ++)); do
+    for ((II=1; II<=$_arg_nparallel; II++)); do
 	optiOutDir="${DIR}/$(printf "%04d" ${timeLimit})sec_${RATIO}ratio_repeats${UUID}/$(printf "%04d" $timeLimit)sec_${RATIO}ratio_trial$(printf %03d $JJ)_${II}"
 	echo "Writing to ${optiOutDir}"
 	mkdir -p "${optiOutDir}"
