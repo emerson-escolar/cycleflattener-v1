@@ -46,6 +46,40 @@ S2() {
     uv run ./repeated_parser.py ./${NAME}/$(printf "%04d" ${TIME})sec_0.4ratio_repeats
 }
 
+C() {
+    local NUM="$1"
+    local NAME=cylinder_2.0_1.0_${NUM}
+    local TIME=5
+    local NSOLVE=3
 
-S1
-S2
+    # basic run
+    ./experiment_cylinder.sh --timeLimit ${TIME} --nSolve ${NSOLVE} --nouuid ${NUM}
+
+    # collect results for basic runs
+    local COLL=./${NAME}/${NAME}_collected.txt
+    for tt in 0.1 0.2 0.4; do
+	echo "**************************************************" >> ${COLL}
+	echo ${tt} >> ${COLL}
+	uv run cf_tabler ./${NAME}/${NAME}.txt ./${NAME}/$(printf "%04d" ${TIME})sec_${tt}ratio/${NAME}_0th_solutions_v2.json >> ${COLL}
+    done
+
+    # repeated runs. hardcoded to do 0.2
+    ./experiment_repeated.sh --timeLimit ${TIME} --nSolve ${NSOLVE} --ratio 0.2 --nRepeat 100 --nParallel 1 --nouuid ${NAME}/ ${NAME}
+    uv run ./repeated_parser.py ./${NAME}/$(printf "%04d" ${TIME})sec_0.2ratio_repeats
+
+    # repeated runs. hardcoded to do 0.4
+    ./experiment_repeated.sh --timeLimit ${TIME} --nSolve ${NSOLVE} --ratio 0.4 --nRepeat 100 --nParallel 1 --nouuid ${NAME}/ ${NAME}
+    uv run ./repeated_parser.py ./${NAME}/$(printf "%04d" ${TIME})sec_0.4ratio_repeats
+
+
+    # extended runs. hardcoded to do 30 mins x 2, t=0.2
+    local EXTTIME=1800
+    ./experiment_repeated.sh --timeLimit ${EXTTIME} --nSolve 2 --ratio 0.2 --nRepeat 2 --nParallel 1 --nouuid ${NAME}/ ${NAME}
+    uv run ./repeated_parser.py ./${NAME}/$(printf "%04d" ${EXTTIME})sec_0.2ratio_repeats
+
+    # extended runs. hardcoded to do 30 mins x 2, t=0.4
+    ./experiment_repeated.sh --timeLimit ${EXTTIME} --nSolve 2 --ratio 0.4 --nRepeat 2 --nParallel 1 --nouuid ${NAME}/ ${NAME}
+    uv run ./repeated_parser.py ./${NAME}/$(printf "%04d" ${EXTTIME})sec_0.4ratio_repeats
+}
+
+C 500
