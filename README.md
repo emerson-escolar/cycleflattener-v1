@@ -43,7 +43,10 @@ The instructions below assume the use of the Python package and project manager 
 
 2. Change into `replication` directory and run the scripts.
 
-
+3. The main script for running the computational demonstrations in the paper is
+   ```bash
+   ./experiment_forpaper.sh
+   ```
 
 # Running tests.
 
@@ -52,3 +55,11 @@ Run
 uv run pytest
 ```
 in the base directory.
+
+
+
+# Acknowledgements
+
+Initial version of this code is based, with permission, on (unreleased) project "OptimizePlane" developed by
+[Yuta Shimada](https://github.com/yut8a) for his Master's thesis.
+In this project, the code has since been heavily modified with some parts completely rewritten and many new features added.
