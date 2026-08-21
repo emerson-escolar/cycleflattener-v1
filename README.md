@@ -10,7 +10,7 @@ The instructions below assume the use of the Python package and project manager 
 
 0. Install [IBM ILOG CPLEX Optimization Studio 22.1.1](https://www.ibm.com/support/pages/downloading-ibm-ilog-cplex-optimization-studio-2211).
 
-1. In the base directory, create a symlink `cplex_python_3.10` to the cplex python directory.
+1. In the base directory of this project, create a symlink `cplex_python_3.10` to the cplex python directory.
    On macOS:
    ```bash
    ln -s /Applications/CPLEX_Studio2211/cplex/python/3.10/arm64_osx/ cplex_python_3.10
@@ -62,4 +62,4 @@ in the base directory.
 
 Initial version of this code is based, with permission, on (unreleased) project "OptimizePlane" developed by
 [Yuta Shimada](https://github.com/yut8a) for his Master's thesis.
-In this project, the code has since been heavily modified with some parts completely rewritten and many new features added.
+In this project, the code has since been heavily modified with most parts completely rewritten and many new features added.
