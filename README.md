@@ -47,6 +47,9 @@ The instructions below assume the use of the Python package and project manager 
    ```bash
    ./experiment_forpaper.sh
    ```
+   Note that due to randomness in the data generation and code, the results will not be exactly the same,
+   but the overall performance of the solver should be similar.
+
 
 # Running tests.
 
