@@ -82,4 +82,8 @@ C() {
     uv run ./repeated_parser.py ./${NAME}/$(printf "%04d" ${EXTTIME})sec_0.4ratio_repeats
 }
 
+S1
+S2
+C 300
 C 500
+C 1000

@@ -1,4 +1,14 @@
+# Summary
+
+Code for angle optimal homologous cycle problem.
+
+# Preliminaries
+
+The instructions below assume the use of the Python package and project manager [uv](https://docs.astral.sh/uv/).
+
 # Installation
+
+0. Install [IBM ILOG CPLEX Optimization Studio 22.1.1](https://www.ibm.com/support/pages/downloading-ibm-ilog-cplex-optimization-studio-2211).
 
 1. In the base directory, create a symlink `cplex_python_3.10` to the cplex python directory.
    On macOS:
@@ -13,16 +23,15 @@
 
 # Usage
 
-1. The main script is `aohcp_longest.py`. You can run this by calling:
+1. The main script is `aohcp_main.py`. You can run this by calling:
    ```
-   uv run aohcp_longest.py
+   uv run aohcp_main.py
    ```
-   in the same folder. Or,
+   in the folder containing it (src/cycleflattener). Or,
    ```
    uv run -m cycleflattener
    ```
    anywhere within the project.
-
 
 
 # Running the provided experiments
